@@ -1,3 +1,4 @@
+//hogehogewhale
 /* main.cpp
 *
 *	main source for GRAPPA PAINT  
