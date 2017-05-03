@@ -11,10 +11,14 @@
 #include<string.h>
 
 #include<GL/glut.h>
+#include<GRAPPA.h>
 
 /* Number of Windows */
 const int WinNum = 1;
 int WindowID[WinNum];
+
+/* Flags */
+bool MFLAG = false; /* Mouse Flag */
 
 /* Function Prototype Declaration */
 void WindowCanvas(void);
@@ -30,19 +34,21 @@ void menu(int val);
 void keyboard(unsigned char key, int x, int y);
 void keyboard_sp(int key, int x, int y);
 
+/* Declaration of new GRAPPA class */
+GRAPPA Drawing;
 
 /* main function */
 int main(int argc, char *argv[]){
 	srand((unsigned) time(NULL));
+	
 	glutInit(&argc, argv);
-	/* histogram window */
 	WindowCanvas();
 	PopUpMenu();
 	Controler();
+	
 	glutMainLoop();
 	return 0;
 }
-
 
 /******** Functions *********/
 
@@ -88,15 +94,13 @@ void idle(void){
 void display(void){
 	glClear(GL_COLOR_BUFFER_BIT);
 	
-	double Cmargin = 10.0;		
-	glColor3d(1.0,1.0,1.0);
-	glBegin(GL_QUADS);
-	glVertex2d(Cmargin/100,Cmargin/100);
-	glVertex2d((100-Cmargin)/100,Cmargin/100);
-	glVertex2d((100-Cmargin)/100,(100-Cmargin)/100);
-	glVertex2d(Cmargin/100,(100-Cmargin)/100);
-	glEnd();
+	Drawing.SetColor(1.0,1.0,1.0);
+	Drawing.DrawCanvas();
 
+	Drawing.SetColor(0.0,0.0,0.0);
+	Drawing.DrawFreeHand();
+	Drawing.Display();
+	
 	glFlush();
 }
 
@@ -105,18 +109,19 @@ void resize(int w, int h){
 	glViewport(0, 0, w ,h);
 	glLoadIdentity();
 	gluOrtho2D(0.0, 1.0, 0.0, 1.0);
+	Drawing.Init(w,h);
 }
 
 
 /* mouse click */
 void mouse(int button, int state, int x, int y){
-	int ID = glutGetWindow();
 	switch (button) {
 		case GLUT_LEFT_BUTTON:
 			if(state==GLUT_UP){
 				MFLAG = false;
 			}
 			if(state==GLUT_DOWN){
+				Drawing.NewFreeHand();
 			}
 			glutIdleFunc(idle);
 			break;
@@ -128,18 +133,9 @@ void mouse(int button, int state, int x, int y){
 
 /* mouse motion */
 void motion(int x, int y){
-	static int xmouse;
-	static int ymouse;
-
 	if(MFLAG){
-		int ID = glutGetWindow();
-		if(ID==WindowID[0]){ /* for Histgram Window */
-			glutIdleFunc(idle);
-		}
+		Drawing.SetCoordinate(x,y);
 	}
-	glutIdleFunc(idle);
-	xmouse = x;
-	ymouse = y;
 	MFLAG  = true;
 }
 
@@ -159,8 +155,17 @@ void keyboard(unsigned char key, int x, int y){
 		case 'q': /* Quit */
 		case 'Q':
 		case '\033':
-			printf("\033[39m\033[49m\n");
 			exit(0);
+		case 'z': /* Undo */
+		case 'Z':
+			Drawing.Undo();
+			glutIdleFunc(idle);
+			break;
+		case 's':
+		case 'S':
+			Drawing.Status();
+			glutIdleFunc(idle);
+			break;
 		default:
 			break;
 	}
