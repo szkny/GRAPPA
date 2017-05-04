@@ -123,6 +123,7 @@ void mouse(int button, int state, int x, int y){
 			}
 			if(state==GLUT_DOWN){
 				Drawing.NewFreeHand();
+				Drawing.SetCoordinate(x,y);
 			}
 			glutIdleFunc(idle);
 			break;

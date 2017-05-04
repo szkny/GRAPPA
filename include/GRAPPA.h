@@ -15,15 +15,17 @@
 #include<MyGLUT.h>
 
 #define FreeMAX 1000 /* Element of Free Hand */
-#define LineNum 100  /* Maximum Line Number of Free Hand */
+#define LineNum 1000 /* Maximum Line Number of Free Hand */
 
 
 class GRAPPA{
 	private:
+		double Cmargin; /* Margin of Canvas (%) */
 		int WX,WY; /* Window Size */
 		int Px[FreeMAX][LineNum],Py[FreeMAX][LineNum]; /* X,Y Coordinate */
 		int Counter[LineNum],ID; /* Element Counter & Line Number ID */
 		bool SFLAG; /* Status Flag */
+		double LineColor[3][LineNum]; /* Line Color [0,1,2]=[R,G,B] */
 	public:
 		void Init(int WX, int XY);
 		void NewFreeHand();
@@ -38,6 +40,7 @@ class GRAPPA{
 
 
 void GRAPPA::Init(int wx, int wy){
+	Cmargin = 2.0;
 	WX = wx;
 	WY = wy;
 	for(int j=0;j<LineNum;++j){
@@ -45,10 +48,13 @@ void GRAPPA::Init(int wx, int wy){
 			Px[i][j] = 0;
 			Py[i][j] = 0;
 		}
+		for(int i=0;i<3;++i){
+			LineColor[i][j] = 0.0;
+		}
 		Counter[j] = 0;
 	}
 	ID = 0;
-	SFLAG = false;
+	SFLAG = true;
 }
 
 
@@ -65,12 +71,13 @@ void GRAPPA::Undo(){
 
 
 void GRAPPA::SetColor(double R, double G, double B){
-	glColor3d(R,G,B);
+	LineColor[0][ID] = R;
+	LineColor[1][ID] = G;
+	LineColor[2][ID] = B;
 }
 
 
 void GRAPPA::DrawCanvas(){
-	double Cmargin = 2.0;
 	glColor3d(1.0,1.0,1.0);
 	glBegin(GL_QUADS);
 	glVertex2d(Cmargin/100,Cmargin/100);
@@ -92,12 +99,31 @@ void GRAPPA::SetCoordinate(int x, int y){
 
 
 void GRAPPA::DrawFreeHand(){
+	glPointSize(2.0);
+	glLineWidth(2.0);
 	for(int j=0;j<=ID;++j){
-		glBegin(GL_LINE_STRIP);
-		for(int i=0;i<Counter[j];++i){
-			glVertex2d((double)Px[i][j]/WX,1-(double)Py[i][j]/WY);
+		glColor3d(LineColor[0][j],LineColor[1][j],LineColor[2][j]);
+		if(Counter[j]==1){
+			glBegin(GL_POINTS);
+			glVertex2d((double)Px[0][j]/WX,1-(double)Py[0][j]/WY);
+			glEnd();
 		}
-		glEnd();
+		else{
+			glBegin(GL_LINE_STRIP);
+			for(int i=0;i<Counter[j];++i){
+				if((double)Px[i][j]<=(double)Cmargin/100*WX)
+					glVertex2d((double)Cmargin/100,1-(double)Py[i][j]/WY);
+				else if((double)(100-Cmargin)/100*WX<=(double)Px[i][j])
+					glVertex2d(1.0-(double)Cmargin/100,1-(double)Py[i][j]/WY);
+				else if((double)Py[i][j]<=(double)Cmargin/100*WY)
+					glVertex2d((double)Px[i][j]/WX,1.0-(double)Cmargin/100);
+				else if((double)(100-Cmargin)/100*WY<=(double)Py[i][j])
+					glVertex2d((double)Px[i][j]/WX,(double)Cmargin/100);
+				else
+					glVertex2d((double)Px[i][j]/WX,1-(double)Py[i][j]/WY);
+			}
+			glEnd();
+		}
 	}
 }
 
