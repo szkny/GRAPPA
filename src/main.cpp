@@ -20,7 +20,7 @@ int WindowID[WinNum];
 
 /* Flags */
 bool MFLAG = false; /* Mouse Flag */
-
+bool M_Nodrag= false;/*For Drawing without Draggingmouse*/
 /* Function Prototype Declaration */
 void WindowCanvas(void);
 void PopUpMenu(void);
@@ -40,7 +40,7 @@ GRAPPA Drawing;
 
 /* main function */
 int main(int argc, char *argv[]){
-	srand((unsigned) time(NULL));
+	srand((unsigned) time(NULL));//?
 	
 	glutInit(&argc, argv);
 	WindowCanvas();
@@ -67,13 +67,21 @@ void WindowCanvas(void){
 void PopUpMenu(void){
 	glutCreateMenu(menu);
 	glutAddMenuEntry("Quit",0);
+    //glutAddMenuEntry("select color",1);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
 
 void Controler(void){
 	glutMouseFunc(mouse);
-	glutMotionFunc(motion);
+    if(M_Nodrag) {
+        glutMotionFunc(NULL);
+        glutPassiveMotionFunc(motion);//allows to draw without Dragging mouse
+    }
+    else {
+        glutPassiveMotionFunc(NULL);
+        glutMotionFunc(motion);
+    }
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(keyboard_sp);
 }
@@ -168,6 +176,18 @@ void keyboard(unsigned char key, int x, int y){
 			Drawing.Status();
 			glutIdleFunc(idle);
 			break;
+        case 'n':
+            if(M_Nodrag){
+                M_Nodrag = false;
+                MFLAG = false;
+            }
+             else {
+                 M_Nodrag = true;
+                 MFLAG = true;
+                 Drawing.NewFreeHand();
+             }
+            Controler();
+            break;
 		default:
 			break;
 	}
