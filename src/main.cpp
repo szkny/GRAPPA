@@ -1,8 +1,8 @@
-//hogehogewhale
 /* main.cpp
 *
 *	main source for GRAPPA PAINT  
-*		(c) M,Haroon, S.Suzuki 2017.4.26
+*		(c) M,Haroon, S.Suzuki 2017.4.26 (origin)
+*					patch ———— 2017.5.5 (vol0.1.2)
 */
 
 #include<stdio.h>
@@ -40,8 +40,6 @@ GRAPPA Drawing;
 
 /* main function */
 int main(int argc, char *argv[]){
-	srand((unsigned) time(NULL));//?
-	
 	glutInit(&argc, argv);
 	WindowCanvas();
 	PopUpMenu();
@@ -88,7 +86,7 @@ void Controler(void){
 
 
 void init(void){
-	glClearColor(0.1,0.1,0.1,1.0);
+	glClearColor(0.2,0.2,0.2,1.0);
 }
 
 
@@ -126,12 +124,23 @@ void resize(int w, int h){
 void mouse(int button, int state, int x, int y){
 	switch (button) {
 		case GLUT_LEFT_BUTTON:
-			if(state==GLUT_UP){
-				MFLAG = false;
+			if(M_Nodrag){
+				if(state==GLUT_DOWN){
+					MFLAG = false;
+				}
+				if(state==GLUT_UP){
+					Drawing.NewFreeHand();
+					Drawing.SetCoordinate(x,y);
+				}
 			}
-			if(state==GLUT_DOWN){
-				Drawing.NewFreeHand();
-				Drawing.SetCoordinate(x,y);
+			else{
+				if(state==GLUT_UP){
+					MFLAG = false;
+				}
+				if(state==GLUT_DOWN){
+					Drawing.NewFreeHand();
+					Drawing.SetCoordinate(x,y);
+				}
 			}
 			glutIdleFunc(idle);
 			break;
