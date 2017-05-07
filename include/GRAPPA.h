@@ -23,9 +23,10 @@ class GRAPPA{
 		double Cmargin; /* Margin of Canvas (%) */
 		int WX,WY; /* Window Size */
 		int Px[FreeMAX][LineNum],Py[FreeMAX][LineNum]; /* X,Y Coordinate */
-		int Counter[LineNum],ID; /* Element Counter & Line Number ID */
+		int Counter[LineNum],ID; /* Line Element Counter & Line ID */
 		bool SFLAG; /* Status Flag */
 		double LineColor[3][LineNum]; /* Line Color [0,1,2]=[R,G,B] */
+		double LineWidth[LineNum]; /* Line Width */
 	public:
 		void Init(int WX, int XY);
 		void NewFreeHand();
@@ -51,6 +52,7 @@ void GRAPPA::Init(int wx, int wy){
 		for(int i=0;i<3;++i){
 			LineColor[i][j] = 0.0;
 		}
+		LineWidth[j] = 3.0;
 		Counter[j] = 0;
 	}
 	ID = 0;
@@ -94,14 +96,17 @@ void GRAPPA::SetCoordinate(int x, int y){
 		Py[Counter[ID]][ID] = y;
 		Counter[ID]++;
 	}
-	else Counter[ID] = 0;
+	else{
+		ID++;
+		if(LineNum<ID) ID = 0;
+	}
 }
 
 
 void GRAPPA::DrawFreeHand(){
-	glPointSize(2.0);
-	glLineWidth(2.0);
 	for(int j=0;j<=ID;++j){
+		glPointSize(LineWidth[j]);
+		glLineWidth(LineWidth[j]);
 		glColor3d(LineColor[0][j],LineColor[1][j],LineColor[2][j]);
 		if(Counter[j]==1){
 			glBegin(GL_POINTS);
@@ -135,7 +140,7 @@ void GRAPPA::Display(){
 		int y = (Counter[ID]>1)? Py[Counter[ID]-1][ID]:0;
 		sprintf(s,"[%d,%d]",x,y);
 		glDrawString(s,0.03,0.95);
-		sprintf(s,"No. %d",ID);
+		sprintf(s,"Line No. %d Length %d",ID,Counter[ID]);
 		glDrawString(s,0.03,0.92);
 	}
 }
