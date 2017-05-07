@@ -21,6 +21,7 @@ int WindowID[WinNum];
 /* Flags */
 bool MFLAG = false; /* Mouse Flag */
 bool M_Nodrag= false;/*For Drawing without Draggingmouse*/
+
 /* Function Prototype Declaration */
 void WindowCanvas(void);
 void PopUpMenu(void);
@@ -72,14 +73,14 @@ void PopUpMenu(void){
 
 void Controler(void){
 	glutMouseFunc(mouse);
-    if(M_Nodrag) {
-        glutMotionFunc(NULL);
-        glutPassiveMotionFunc(motion);//allows to draw without Dragging mouse
-    }
-    else {
-        glutPassiveMotionFunc(NULL);
-        glutMotionFunc(motion);
-    }
+	if(M_Nodrag) {
+		glutMotionFunc(NULL);
+		glutPassiveMotionFunc(motion);//allows to draw without Dragging mouse
+	}
+	else {
+		glutPassiveMotionFunc(NULL);
+		glutMotionFunc(motion);
+	}
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(keyboard_sp);
 }
@@ -100,14 +101,11 @@ void idle(void){
 
 void display(void){
 	glClear(GL_COLOR_BUFFER_BIT);
-	
-	Drawing.SetColor(1.0,1.0,1.0);
-	Drawing.DrawCanvas();
 
-	Drawing.SetColor(0.0,0.0,0.0);
+	Drawing.DrawCanvas();
 	Drawing.DrawFreeHand();
 	Drawing.Display();
-	
+
 	glFlush();
 }
 
@@ -185,18 +183,18 @@ void keyboard(unsigned char key, int x, int y){
 			Drawing.Status();
 			glutIdleFunc(idle);
 			break;
-        case 'n':
-            if(M_Nodrag){
-                M_Nodrag = false;
-                MFLAG = false;
-            }
-             else {
-                 M_Nodrag = true;
-                 MFLAG = true;
-                 Drawing.NewFreeHand();
-             }
-            Controler();
-            break;
+		case 'n':
+			if(M_Nodrag){
+				M_Nodrag = false;
+				MFLAG = false;
+			}
+			else {
+				M_Nodrag = true;
+				MFLAG = true;
+				Drawing.NewFreeHand();
+			}
+			Controler();
+			break;
 		default:
 			break;
 	}
