@@ -52,7 +52,7 @@ void GRAPPA::Init(int wx, int wy){
 		for(int i=0;i<3;++i){
 			LineColor[i][j] = 0.0;
 		}
-		LineWidth[j] = 3.0;
+		LineWidth[j] = 2.0;
 		Counter[j] = 0;
 	}
 	ID = 0;
