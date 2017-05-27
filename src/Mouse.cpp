@@ -9,6 +9,7 @@ bool MFLAG;
 bool M_Nodrag;
 extern GRAPPA Drawing;
 
+
 /* mouse click */
 void MouseClick(int button, int state, int x, int y){
 	switch (button) {

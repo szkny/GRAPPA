@@ -4,6 +4,7 @@
 /************ Material Color Structure ************/
 /********** by M.J.Kilgard & M.Yamamoto ***********/
 
+
 struct MaterialStruct {
 	GLfloat ambient[4];
 	GLfloat diffuse[4];

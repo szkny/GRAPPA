@@ -11,6 +11,7 @@ extern GRAPPA Drawing;
 
 void MouseDrawMode(void);
 
+
 void KeyboardShortcut(unsigned char key, int x, int y){
 	switch(key){
 		case 'q': /* Quit */

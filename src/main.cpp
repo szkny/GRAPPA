@@ -2,7 +2,7 @@
 *
 *	main source for GRAPPA PAINT  
 *		(c) M,Haroon, S.Suzuki 2017.4.26 (origin)
-*					patch ———— 2017.5.5 (vol0.1.2)
+*					patch ———— 2017.5.28 (vol0.2.0)
 */
 
 #include<stdio.h>
@@ -13,6 +13,7 @@
 
 #include<GL/glut.h>
 #include<GRAPPA.h>
+
 
 /* Function Prototype Declaration */
 void WindowCanvas(void);
