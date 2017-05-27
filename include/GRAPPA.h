@@ -28,19 +28,19 @@ class GRAPPA{
 		double LineColor[3][LineNum]; /* Line Color [0,1,2]=[R,G,B] */
 		double LineWidth[LineNum]; /* Line Width */
 	public:
-		void Init(int WX, int XY);
-		void NewFreeHand();
-		void Undo();
-		void SetColor(double R, double G, double B);
-		void DrawCanvas();
-		void SetCoordinate(int x, int y);
-		void DrawFreeHand();
-		void Display();
-		void Status();
+		inline void Init(int WX, int XY);
+		inline void NewFreeHand();
+		inline void Undo();
+		inline void SetColor(double R, double G, double B);
+		inline void DrawCanvas();
+		inline void SetCoordinate(int x, int y);
+		inline void DrawFreeHand();
+		inline void Display();
+		inline void Status();
 };
 
 
-void GRAPPA::Init(int wx, int wy){
+inline void GRAPPA::Init(int wx, int wy){
 	Cmargin = 2.0;
 	WX = wx;
 	WY = wy;
@@ -60,26 +60,26 @@ void GRAPPA::Init(int wx, int wy){
 }
 
 
-void GRAPPA::NewFreeHand(){
+inline void GRAPPA::NewFreeHand(){
 	ID++;
 	if(LineNum<ID) ID = 0;
 }
 
 
-void GRAPPA::Undo(){
+inline void GRAPPA::Undo(){
 	Counter[ID] = 0;
 	if(0<ID) ID--;
 }
 
 
-void GRAPPA::SetColor(double R, double G, double B){
+inline void GRAPPA::SetColor(double R, double G, double B){
 	LineColor[0][ID] = R;
 	LineColor[1][ID] = G;
 	LineColor[2][ID] = B;
 }
 
 
-void GRAPPA::DrawCanvas(){
+inline void GRAPPA::DrawCanvas(){
 	glColor3d(1.0,1.0,1.0);
 	glBegin(GL_QUADS);
 	glVertex2d(Cmargin/100,Cmargin/100);
@@ -90,7 +90,7 @@ void GRAPPA::DrawCanvas(){
 }
 
 
-void GRAPPA::SetCoordinate(int x, int y){
+inline void GRAPPA::SetCoordinate(int x, int y){
 	if(Counter[ID]<FreeMAX){
 		Px[Counter[ID]][ID] = x;
 		Py[Counter[ID]][ID] = y;
@@ -103,7 +103,7 @@ void GRAPPA::SetCoordinate(int x, int y){
 }
 
 
-void GRAPPA::DrawFreeHand(){
+inline void GRAPPA::DrawFreeHand(){
 	for(int j=0;j<=ID;++j){
 		glPointSize(LineWidth[j]);
 		glLineWidth(LineWidth[j]);
@@ -133,7 +133,7 @@ void GRAPPA::DrawFreeHand(){
 }
 
 
-void GRAPPA::Display(){
+inline void GRAPPA::Display(){
 	if(SFLAG){
 		char s[50];
 		int x = (Counter[ID]>1)? Px[Counter[ID]-1][ID]:0;
@@ -146,7 +146,7 @@ void GRAPPA::Display(){
 }
 
 
-void GRAPPA::Status(){
+inline void GRAPPA::Status(){
 	if(SFLAG) SFLAG = false;
 	else SFLAG = true;
 }
