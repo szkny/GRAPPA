@@ -1,65 +1,66 @@
 # GNUmakefile
-#		(c) S.Suzuki 2017.1.16
+#		(c) S.Suzuki 2017.1.16 ————— patch 2017.5.28
 
-NAME    := main
+
+NAME    := GRAPPA
 
 SUFFIX   = .cpp
 SRCDIR   = ./src
 INCLUDE  = -I./include
 EXEDIR   = ./bin
 
+OBJ      = .o
+
 COMPILER = g++
 CFLAGS   = -Wall -O2
 FRAME    = -framework GLUT -framework OpenGL 
 
 #! DO NOT EDIT !#
-SOURCES  = $(if $(NAME),$(EMPTY),$(wildcard $(SRCDIR)/*$(SUFFIX)))
-TARGETS  = $(addprefix $(EXEDIR)/,$(notdir $(basename $(SOURCES))))
+SOURCES  = $(wildcard $(SRCDIR)/*$(SUFFIX))
+OBJECTS  = $(addsuffix $(OBJ),$(notdir $(basename $(SOURCES))))
 
 # compile "NAME"
-$(NAME):
-	$(COMPILER) $(INCLUDE) $(CFLAGS) $(FRAME) -o $(EXEDIR)/$@ $(SRCDIR)/$(NAME)$(SUFFIX)
+$(NAME):$(OBJECTS)
+	$(COMPILER) $(INCLUDE) $(CFLAGS) $(FRAME) -o $(EXEDIR)/$@ $(OBJECTS)
 
-# macro for make all
+# macro for make
 define MACRO
-	$(COMPILER) $(INCLUDE) $(CFLAGS) $(FRAME) -o $@ $(word $1,$(SOURCES))
+	$(COMPILER) $(INCLUDE) $(CFLAGS) $(FRAME) -c $(word $1,$(SOURCES))
 endef
 
-# make all
-.PHONY: all
-all:$(TARGETS)
-$(word 1,$(TARGETS)):
+.PHONY:$(OBJECTS)
+$(word 1,$(OBJECTS)): 
 	$(call MACRO,1)
-$(word 2,$(TARGETS)):
+$(word 2,$(OBJECTS)):
 	$(call MACRO,2)
-$(word 3,$(TARGETS)):
+$(word 3,$(OBJECTS)):
 	$(call MACRO,3)
-$(word 4,$(TARGETS)):
+$(word 4,$(OBJECTS)):
 	$(call MACRO,4)
-$(word 5,$(TARGETS)):
+$(word 5,$(OBJECTS)):
 	$(call MACRO,5)
-$(word 6,$(TARGETS)):
+$(word 6,$(OBJECTS)):
 	$(call MACRO,6)
-$(word 7,$(TARGETS)):
+$(word 7,$(OBJECTS)):
 	$(call MACRO,7)
-$(word 8,$(TARGETS)):
+$(word 8,$(OBJECTS)):
 	$(call MACRO,8)
-$(word 9,$(TARGETS)):
+$(word 9,$(OBJECTS)):
 	$(call MACRO,9)
-$(word 10,$(TARGETS)):
+$(word 10,$(OBJECTS)):
 	$(call MACRO,10)
-$(word 11,$(TARGETS)):
+$(word 11,$(OBJECTS)):
 	$(call MACRO,11)
-$(word 12,$(TARGETS)):
+$(word 12,$(OBJECTS)):
 	$(call MACRO,12)
-$(word 13,$(TARGETS)):
+$(word 13,$(OBJECTS)):
 	$(call MACRO,13)
-$(word 14,$(TARGETS)):
+$(word 14,$(OBJECTS)):
 	$(call MACRO,14)
-$(word 15,$(TARGETS)):
+$(word 15,$(OBJECTS)):
 	$(call MACRO,15)
 
 # make clean
 .PHONY: clean
 clean: 
-	$(RM) $(wildcard $(EXEDIR)/*)
+	$(RM) $(OBJECTS)

@@ -3,20 +3,22 @@
 
 /***************************/
 
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h>
+#include<string.h>
 #include<GL/glut.h>
 
 #include"define.h"
 
 /* Polygon Mode */
-bool PFLAG  =  true;    
+static bool PFLAG  =  true;
 
 /**************** Drawing Function ******************/
 
 /* Drawing String Function (string,position x,position y) */
-void glDrawString(const char *str, double x0, double y0){
+inline void glDrawString(const char *str, double x0, double y0){
 	int size = strlen(str);
 	glRasterPos2d(x0, y0);
 	for(int i = 0; i < size; ++i){
@@ -27,7 +29,7 @@ void glDrawString(const char *str, double x0, double y0){
 
 
 /* Drawing Small String Function (string,position x,position y) */
-void glDrawString2(const char *str, double x0, double y0){
+inline void glDrawString2(const char *str, double x0, double y0){
 	int size = strlen(str);
 	glRasterPos2d(x0, y0);
 	for(int i = 0; i < size; ++i){
@@ -38,7 +40,7 @@ void glDrawString2(const char *str, double x0, double y0){
 
 
 /* Draw Rectangular Function (length1,length2,length3,position-xyz) */
-void glRectangular(double lx, double ly, double lz, double x, double y, double z){
+inline void glRectangular(double lx, double ly, double lz, double x, double y, double z){
 	if(lx<=0||ly<=0||lz<=0){
 		printf("error : the argument lx,ly,lz of glRectangular() must be positive.\n");
 		exit(1);
@@ -103,7 +105,7 @@ void glRectangular(double lx, double ly, double lz, double x, double y, double z
 
 
 /* Draw Hexagonal Prism Function (radius,length,position—xyz) */
-void glHexagon(double r, double l, double x, double y, double z){
+inline void glHexagon(double r, double l, double x, double y, double z){
 	
 	if(r<=0||l<=0){
 		printf("error : the argument r,l of glPentagon() must be positive.\n");
@@ -196,7 +198,7 @@ void glHexagon(double r, double l, double x, double y, double z){
 
 
 /* Draw Cylinder Function (radius,length,position—xyz) */
-void glCylinder(double r, double l, double x, double y, double z){
+inline void glCylinder(double r, double l, double x, double y, double z){
 	if(r<=0||l<=0){
 		printf("error : the argument r,l of glCylinder() must be positive.\n");
 		exit(1);
@@ -293,7 +295,7 @@ void glCylinder(double r, double l, double x, double y, double z){
 
 
 /* Draw Pipe Function (radius,thickness,length,position—xyz) */
-void glPipe(double r,double d, double l, double x, double y, double z){
+inline void glPipe(double r,double d, double l, double x, double y, double z){
 	if(r<=0||d<=0||l<=0){
 		printf("error : the argument r,d,l of glTube() must be positive.\n");
 		exit(1);
@@ -449,7 +451,7 @@ void glPipe(double r,double d, double l, double x, double y, double z){
 
 
 /* Draw N-Side Polygon Prism Function (N,radius,length,position—xyz) */
-void glPrism(const int N, double r, double l, double x, double y, double z){
+inline void glPrism(const int N, double r, double l, double x, double y, double z){
 	if(N<=0||r<=0||l<=0){
 		printf("error : the argument (int)N,(double)r,(double)l of glPrism() must be positive.\n");
 		exit(1);
