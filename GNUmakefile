@@ -14,12 +14,12 @@ CFLAGS   = -Wall -O2
 FRAME    = -framework GLUT -framework OpenGL 
 
 SOURCES  = $(wildcard $(SRCDIR)/*$(SUFFIX))
-OBJECTS  = $(notdir $(SOURCES:$(SUFFIX)=.o))
-TARGETS  = $(notdir $(basename $(SOURCES)))
+OBJECTS  = $(notdir $(SOURCES:%$(SUFFIX)=%.o))
+TARGETS  = $(basename $(OBJECTS))
 
 # make execute file
 $(NAME): $(OBJECTS)
-	$(COMPILER) $(INCLUDE) $(CFLAGS) $(FRAME) -o $(EXEDIR)/$@ $(OBJECTS)
+	$(COMPILER) $(INCLUDE) $(CFLAGS) $(FRAME) -o $(EXEDIR)/$@ $^
 
 # macro for make object file
 define MACRO
@@ -32,4 +32,4 @@ $(foreach var,$(TARGETS),$(eval $(call MACRO,$(var))))
 #make clean
 .PHONY: clean
 clean: 
-	$(RM) $(OBJECTS) $(EXEDIR)/$(NAME)
+	$(RM) $(OBJECTS) 
