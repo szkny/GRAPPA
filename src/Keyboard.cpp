@@ -10,20 +10,15 @@ extern bool M_Nodrag; //defined in Mouce.cpp
 extern GRAPPA Drawing;
 
 void MouseDrawMode(void);
-
+void KeyboardMode(void);
+void InputCommand(unsigned char key, int x, int y);
 
 void KeyboardShortcut(unsigned char key, int x, int y){
 	switch(key){
-		case 'q': /* Quit */
-		case 'Q':
-		case '\033':
-			exit(0);
-		case 'z': /* Undo */
-		case 'Z':
+		case 'u': /* Undo */
 			Drawing.Undo();
 			break;
 		case 's':
-		case 'S':
 			Drawing.Status();
 			break;
 		case 'n':
@@ -38,24 +33,34 @@ void KeyboardShortcut(unsigned char key, int x, int y){
 			}
 			MouseDrawMode();	
 			break;
+		case ':':
+			Drawing.CommandMode();
+			KeyboardMode();
+			break;
 		default:
 			break;
 	}
 }
 
 
-void keyboard_sp(int key, int x, int y){
-	switch (key) {
-		case GLUT_KEY_RIGHT:
-			break;
-		case GLUT_KEY_LEFT:
-			break;
-		case GLUT_KEY_UP:
-			break;
-		case GLUT_KEY_DOWN:
-			break;
-		default:
-			break;
-	}
+void KeyboardMode(void){
+	if(Drawing.CommandFlag()) glutKeyboardFunc(InputCommand);
+	else glutKeyboardFunc(KeyboardShortcut);
 }
+
+
+//void keyboard_sp(int key, int x, int y){
+//	switch (key) {
+//		case GLUT_KEY_RIGHT:
+//			break;
+//		case GLUT_KEY_LEFT:
+//			break;
+//		case GLUT_KEY_UP:
+//			break;
+//		case GLUT_KEY_DOWN:
+//			break;
+//		default:
+//			break;
+//	}
+//}
 

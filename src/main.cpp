@@ -1,7 +1,7 @@
 /* main.cpp
 *
 *	main source for GRAPPA PAINT  
-*		(c) M,Haroon, S.Suzuki 2017.4.26 (origin)
+*		(c) M.Haroon, S.Suzuki 2017.4.26 (origin)
 *					patch ———— 2017.5.28 (vol0.2.0)
 */
 
@@ -19,12 +19,14 @@
 void WindowCanvas(void);
 void Controler(void);
 void MouseDrawMode(void);
+void KeyboardMode(void);
 void PopUpMenu(void);
 void Display(void);
 void Resize(int w, int h);
 void MouseClick(int button, int state, int x, int y);
 void MouseMotion(int x, int y);
 void KeyboardShortcut(unsigned char key, int x, int y);
+void CommandLine(unsigned char key, int x, int y);
 void keyboard_sp(int key, int x, int y);
 
 /* Declaration of new GRAPPA class */
@@ -57,7 +59,7 @@ void WindowCanvas(void){
 void Controler(void){
 	glutMouseFunc(MouseClick);
 	MouseDrawMode();
-	glutKeyboardFunc(KeyboardShortcut);
+	KeyboardMode();
 	glutSpecialFunc(keyboard_sp);
 }
 
