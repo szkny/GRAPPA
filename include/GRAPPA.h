@@ -249,7 +249,7 @@ inline int GRAPPA::CommandHistory(int key){
 
 inline bool GRAPPA::RunCommand(const char *s0){
 	bool match = false;
-	if(!strcmp(CommandString[CmdID],s)) match = true;
+	if(!strcmp(CommandString[CmdID],s0)) match = true;
 	return match;
 }
 

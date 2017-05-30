@@ -11,7 +11,7 @@ extern GRAPPA Drawing;
 
 void MouseDrawMode(void);
 void KeyboardMode(void);
-void InputCommand(unsigned char key, int x, int y);
+void InputKey(unsigned char key, int x, int y);
 
 void KeyboardShortcut(unsigned char key, int x, int y){
 	switch(key){
@@ -44,7 +44,7 @@ void KeyboardShortcut(unsigned char key, int x, int y){
 
 
 void KeyboardMode(void){
-	if(Drawing.CommandFlag()) glutKeyboardFunc(InputCommand);
+	if(Drawing.CommandFlag()) glutKeyboardFunc(InputKey);
 	else glutKeyboardFunc(KeyboardShortcut);
 }
 

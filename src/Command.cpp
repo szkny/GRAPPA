@@ -19,7 +19,7 @@ void Commands(){
 }
 
 
-void InputCommand(unsigned char key, int x, int y){
+void InputKey(unsigned char key, int x, int y){
 	if(key == 127){ //delete key
 		int size = Drawing.CommandStore(key);
 		if(size == 0) KeyboardMode();
