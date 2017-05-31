@@ -32,6 +32,7 @@ class GRAPPA{
 		double LineWidth[LineNum]; /* Line Width */
 		char CommandString[CmdNum][64]; /* Input Command String */
 		int CmdID; /* Command ID */
+		int HstCounter; /* Go Back Counter for CommandHistory */
 	public:
 		GRAPPA();
 		inline void Init(int WX, int XY);
@@ -67,6 +68,7 @@ inline GRAPPA::GRAPPA(){
 	}	ID = 0;
 	SFLAG = true;
 	CmdID = 0;
+	HstCounter = 0;
 }
 
 
@@ -206,11 +208,13 @@ inline int GRAPPA::CommandStore(unsigned char key){
 			if(0<size)
 				memset(CommandString[CmdID]+size-1,'\0',1);
 			else{ 
+				HstCounter = 0;
 				CFLAG = false;
 			}	
 		}
 		else if(key == 13){ //return key
 			if(0<size){
+				if(HstCounter) HstCounter = 0;
 				if(CmdID<CmdNum) ++CmdID;
 				else CmdID = 0;
 				CFLAG = false;
@@ -229,14 +233,22 @@ inline int GRAPPA::CommandStore(unsigned char key){
 inline int GRAPPA::CommandHistory(int key){
 	if(CFLAG){
 		switch(key){
-			case GLUT_KEY_UP:   //up-arrow key
-				if(0<CmdID) --CmdID;
-				break;
-			case GLUT_KEY_DOWN: //down-arrow key
-				if(CmdID<CmdNum){
-					if(strlen(CommandString[CmdID])){
-						++CmdID;
+			case GLUT_KEY_UP://up-arrow key
+				if(0<CmdID-HstCounter){
+					if(strlen(CommandString[CmdID-HstCounter-1])){
+						++HstCounter;
+						strcpy(CommandString[CmdID],CommandString[CmdID-HstCounter]);
 					}
+				}
+				break;
+			case GLUT_KEY_DOWN://down-arrow key
+				if(CmdID-HstCounter<CmdNum-1){
+					if(strlen(CommandString[CmdID-HstCounter+1])){
+						if(0<HstCounter) --HstCounter;
+						strcpy(CommandString[CmdID],CommandString[CmdID-HstCounter]);
+					}
+					if(HstCounter==0)
+						memset(CommandString[CmdID],'\0',sizeof(CommandString[CmdID]));
 				}
 				break;
 			default:
