@@ -31,7 +31,7 @@ void KeyboardShortcut(unsigned char key, int x, int y){
 				MFLAG = true;
 				Drawing.NewFreeHand();
 			}
-			MouseDrawMode();	
+			MouseDrawMode();
 			break;
 		case ':':
 			Drawing.CommandMode();
