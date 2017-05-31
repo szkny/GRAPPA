@@ -17,7 +17,8 @@
 
 #define FreeMAX 1000 /* Element of Free Hand */
 #define LineNum 1000 /* Maximum Line Number of Free Hand */
-#define CmdNum 100  /* Number of Stored Command */
+#define CmdNum   100 /* Number of Stored Command */
+#define ArgNum    10 /* Number of Command Arguments */
 
 
 class GRAPPA{
@@ -33,12 +34,14 @@ class GRAPPA{
 		char CommandString[CmdNum][64]; /* Input Command String */
 		int CmdID; /* Command ID */
 		int HstCounter; /* Go Back Counter for CommandHistory */
+		double CmdArg[ArgNum]; /* Command Arguments */
 	public:
 		GRAPPA();
 		inline void Init(int WX, int XY);
 		inline void NewFreeHand();
 		inline void Undo();
 		inline void SetColor(double R, double G, double B);
+		inline void SetLineWidth(double w);
 		inline void DrawCanvas();
 		inline void SetCoordinate(int x, int y);
 		inline void DrawFreeHand();
@@ -46,11 +49,14 @@ class GRAPPA{
 		inline void Status();
 		inline void CommandMode();
 		inline bool CommandFlag();
-		inline int CommandStore(unsigned char key);
-		inline int CommandHistory(int key);
+		inline int  CommandStore(unsigned char key);
+		inline int  CommandHistory(int key);
 		inline bool RunCommand(const char *s0);
 		inline bool RunCommand(const char *s0, const char *s1);
 		inline bool RunCommand(const char *s0, const char *s1, const char *s2);
+		inline bool RunCommand(const char *s0, double *a1);
+		inline bool RunCommand(const char *s0, double *a1, double *a2);
+		inline bool RunCommand(const char *s0, double *a1, double *a2, double *a3);
 };
 
 
@@ -69,10 +75,19 @@ inline GRAPPA::GRAPPA(){
 	SFLAG = true;
 	CmdID = 0;
 	HstCounter = 0;
+	for(int i=0;i<ArgNum;++i) CmdArg[i] = 0.0;
 }
 
 
 inline void GRAPPA::Init(int wx, int wy){
+
+	/** configuration of anti-aliasing **/
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	/************************************/
+
 	Cmargin = 2.0;
 	WX = wx;
 	WY = wy;
@@ -109,6 +124,11 @@ inline void GRAPPA::SetColor(double R, double G, double B){
 	LineColor[0][ID] = R;
 	LineColor[1][ID] = G;
 	LineColor[2][ID] = B;
+}
+
+
+inline void GRAPPA::SetLineWidth(double w){
+	LineWidth[ID] = w;
 }
 
 
@@ -167,6 +187,7 @@ inline void GRAPPA::DrawFreeHand(){
 
 
 inline void GRAPPA::Display(){
+	glColor3d(0.0,0.0,0.0);
 	if(SFLAG){
 		char s[128];
 		int x = (Counter[ID]>1)? Px[Counter[ID]-1][ID]:0;
@@ -279,6 +300,54 @@ inline bool GRAPPA::RunCommand(const char *s0, const char *s1, const char *s2){
 	if(!strcmp(CommandString[CmdID],s0)) match = true;
 	if(!strcmp(CommandString[CmdID],s1)) match = true;
 	if(!strcmp(CommandString[CmdID],s2)) match = true;
+	return match;
+}
+
+
+inline bool GRAPPA::RunCommand(const char *s0, double *a1){
+	bool match = false;
+	char Command[64];
+	double arg1 = 0.0;
+	sscanf(CommandString[CmdID],"%s %lf",Command,&arg1);
+	if(!strcmp(Command,s0)) match = true;
+	if(match){
+		(*a1) = arg1;
+		printf("Command:%s\t%f\n",Command,(*a1));
+	}
+	return match;
+}
+
+
+inline bool GRAPPA::RunCommand(const char *s0, double *a1, double *a2){
+	bool match = false;
+	char Command[64];
+	double arg1 = 0.0;
+	double arg2 = 0.0;
+	sscanf(CommandString[CmdID],"%s %lf %lf",Command,&arg1,&arg2);
+	if(!strcmp(Command,s0)) match = true;
+	if(match){
+		(*a1) = arg1;
+		(*a2) = arg2;
+		printf("Command:%s\t%f\t%f\n",Command,(*a1),(*a2));
+	}
+	return match;
+}
+
+
+inline bool GRAPPA::RunCommand(const char *s0, double *a1, double *a2, double *a3){
+	bool match = false;
+	char Command[64];
+	double arg1 = 0.0;
+	double arg2 = 0.0;
+	double arg3 = 0.0;
+	sscanf(CommandString[CmdID],"%s %lf %lf %lf",Command,&arg1,&arg2,&arg3);
+	if(!strcmp(Command,s0)) match = true;
+	if(match){
+		(*a1) = arg1;
+		(*a2) = arg2;
+		(*a3) = arg3;
+		printf("Command:%s\t%f\t%f\t%f\n",Command,(*a1),(*a2),(*a3));
+	}
 	return match;
 }
 
