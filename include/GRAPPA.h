@@ -41,7 +41,9 @@ class GRAPPA{
 		inline void NewFreeHand();
 		inline void Undo();
 		inline void SetColor(double R, double G, double B);
+		inline void SetDefaultColor(double R, double G, double B);
 		inline void SetLineWidth(double w);
+		inline void SetDefaultLineWidth(double w);
 		inline void DrawCanvas();
 		inline void SetCoordinate(int x, int y);
 		inline void DrawFreeHand();
@@ -91,20 +93,20 @@ inline void GRAPPA::Init(int wx, int wy){
 	Cmargin = 2.0;
 	WX = wx;
 	WY = wy;
-	for(int j=0;j<LineNum;++j){
-		for(int i=0;i<FreeMAX;++i){
-			Px[i][j] = 0;
-			Py[i][j] = 0;
-		}
-		for(int i=0;i<3;++i){
-			LineColor[i][j] = 0.0;
-		}
-		LineWidth[j] = 2.0;
-		Counter[j] = 0;
-	}
-	ID = 0;
-	SFLAG = true;
-	CmdID = 0;
+//	for(int j=0;j<LineNum;++j){
+//		for(int i=0;i<FreeMAX;++i){
+//			Px[i][j] = 0;
+//			Py[i][j] = 0;
+//		}
+//		for(int i=0;i<3;++i){
+//			LineColor[i][j] = 0.0;
+//		}
+//		LineWidth[j] = 2.0;
+//		Counter[j] = 0;
+//	}
+//	ID = 0;
+//	SFLAG = true;
+//	CmdID = 0;
 }
 
 
@@ -127,8 +129,24 @@ inline void GRAPPA::SetColor(double R, double G, double B){
 }
 
 
+inline void GRAPPA::SetDefaultColor(double R, double G, double B){
+	for(int i=ID+1;i<LineNum;++i){
+		LineColor[0][i] = R;
+		LineColor[1][i] = G;
+		LineColor[2][i] = B;
+	}
+}
+
+
 inline void GRAPPA::SetLineWidth(double w){
 	LineWidth[ID] = w;
+}
+
+
+inline void GRAPPA::SetDefaultLineWidth(double w){
+	for(int i=ID+1;i<LineNum;++i){
+		LineWidth[i] = w;
+	}
 }
 
 

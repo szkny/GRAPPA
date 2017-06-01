@@ -49,13 +49,18 @@ void Commands(){
 	if(Drawing.RunCommand("coy"))
 		Drawing.SetColor(1.0,1.0,0.0);
 
-	if(Drawing.RunCommand("co",&Arg1,&Arg2,&Arg3)){
+	if(Drawing.RunCommand("co",&Arg1,&Arg2,&Arg3))
 		Drawing.SetColor(Arg1,Arg2,Arg3);
-	}
 
-	if(Drawing.RunCommand("lw",&Arg1)){
+	if(Drawing.RunCommand("dco",&Arg1,&Arg2,&Arg3))
+		Drawing.SetDefaultColor(Arg1,Arg2,Arg3);
+
+	if(Drawing.RunCommand("lw",&Arg1))
 		Drawing.SetLineWidth(Arg1);
-	}
+
+	if(Drawing.RunCommand("dlw",&Arg1))
+		Drawing.SetDefaultLineWidth(Arg1);
+		
 }
 
 
