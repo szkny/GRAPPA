@@ -1,30 +1,44 @@
 # GNUmakefile
-#		(c) S.Suzuki 2017.1.16 ————— patch 2017.5.28
+#		(c) S.Suzuki 2017.1.16 ————— patch 2017.6.1
 
 NAME     = GRAPPA
 
 SUFFIX   = .cpp
 
-SRCDIR   = ./src
-INCLUDE  = -I./include
-EXEDIR   = ./bin
+SRC_DIR  = ./src
+INC_DIR  = ./include
+LIB_DIR  = ./lib
+EXE_DIR  = ./bin
 
 COMPILER = g++
 CFLAGS   = -Wall -O2
 FRAME    = -framework GLUT -framework OpenGL 
 
-SOURCES  = $(wildcard $(SRCDIR)/*$(SUFFIX))
+SOURCES  = $(wildcard $(SRC_DIR)/*$(SUFFIX))
 OBJECTS  = $(notdir $(SOURCES:%$(SUFFIX)=%.o))
 TARGETS  = $(basename $(OBJECTS))
+LIBRARY  = $(NAME).a
+
+all: $(LIBRARY) $(NAME)
+	@echo "  ---------------------------------------------  "
+	@echo "     Complete to create $(NAME) into $(EXE_DIR)  "
+	@echo "          Let's try do $(EXE_DIR)/$(NAME) !      "
+	@echo "  ---------------------------------------------  "
+
+# make archives
+$(LIBRARY): $(OBJECTS)
+	ar ru $(LIB_DIR)/$(LIBRARY) $(OBJECTS)
+	ranlib $(LIB_DIR)/$(LIBRARY)
 
 # make execute file
-$(NAME): $(OBJECTS)
-	$(COMPILER) $(INCLUDE) $(CFLAGS) $(FRAME) -o $(EXEDIR)/$@ $^
+$(NAME): $(LIB_DIR)/$(LIBRARY)
+	$(COMPILER) -I$(INC_DIR) $(CFLAGS) $(FRAME) -o $(EXE_DIR)/$@ $^
+	$(RM) $(OBJECTS) 
 
 # macro for make object file
 define MACRO
 $(1).o:
-	$(COMPILER) $(INCLUDE) $(CFLAGS) $(FRAME) -c $(SRCDIR)/$(1)$(SUFFIX)
+	$(COMPILER) -I$(INC_DIR) $(CFLAGS) $(FRAME) -c $(SRC_DIR)/$(1)$(SUFFIX)
 endef
 
 $(foreach var,$(TARGETS),$(eval $(call MACRO,$(var))))
