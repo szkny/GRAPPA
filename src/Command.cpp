@@ -12,57 +12,60 @@ extern GRAPPA Drawing;
 void MouseDrawMode(void);
 void KeyboardMode(void);
 void KeyboardShortcut(unsigned char key, int x, int y);
+void MNDrag(void);
 
 
 void Commands(){
-
 	double Arg1,Arg2,Arg3;
 
 	if(Drawing.RunCommand("q","quit","exit"))
 		exit(0);
 
-	if(Drawing.RunCommand("u","undo"))
+	else if(Drawing.RunCommand("u","undo"))
 		Drawing.Undo();
 
-	if(Drawing.RunCommand("n","nodrag")){
-		if(M_Nodrag){
-			M_Nodrag = false;
-			MFLAG = false;
-		}
-		else {
-			M_Nodrag = true;
-			MFLAG = true;
-			Drawing.NewFreeHand();
-		}
-		MouseDrawMode();
-	}
+	else if(Drawing.RunCommand("r","redo"))
+		Drawing.Redo();
 
-	if(Drawing.RunCommand("cor"))
+	else if(Drawing.RunCommand("n","nodrag"))
+		MNDrag();
+	
+	else if(Drawing.RunCommand("s","status"))
+		Drawing.Status();
+
+	else if(Drawing.RunCommand("reset"))
+		Drawing.Reset();
+
+	else if(Drawing.RunCommand("cor"))
 		Drawing.SetColor(1.0,0.0,0.0);
 
-	if(Drawing.RunCommand("cog"))
+	else if(Drawing.RunCommand("cog"))
 		Drawing.SetColor(0.0,1.0,0.0);
 
-	if(Drawing.RunCommand("cob"))
+	else if(Drawing.RunCommand("cob"))
 		Drawing.SetColor(0.0,0.0,1.0);
 
-	if(Drawing.RunCommand("coy"))
+	else if(Drawing.RunCommand("coy"))
 		Drawing.SetColor(1.0,1.0,0.0);
 
-	if(Drawing.RunCommand("co",&Arg1,&Arg2,&Arg3))
+	else if(Drawing.RunCommand("co",&Arg1,&Arg2,&Arg3))
 		Drawing.SetColor(Arg1,Arg2,Arg3);
 
-	if(Drawing.RunCommand("dco",&Arg1,&Arg2,&Arg3))
+	else if(Drawing.RunCommand("dco",&Arg1,&Arg2,&Arg3))
 		Drawing.SetDefaultColor(Arg1,Arg2,Arg3);
 
-	if(Drawing.RunCommand("lw",&Arg1))
+	else if(Drawing.RunCommand("lw",&Arg1))
 		Drawing.SetLineWidth(Arg1);
 
-	if(Drawing.RunCommand("dlw",&Arg1))
+	else if(Drawing.RunCommand("dlw",&Arg1))
 		Drawing.SetDefaultLineWidth(Arg1);
-		
-}
 
+	else if(Drawing.RunCommand("setid",&Arg1))
+		Drawing.SetLineID(Arg1);
+
+	else if(Drawing.RunCommand("backid"))
+		Drawing.BackLineID();
+}
 
 
 void InputKey(unsigned char key, int x, int y){
@@ -83,6 +86,9 @@ void InputKey(unsigned char key, int x, int y){
 
 /* arrow key */
 void keyboard_sp(int key, int x, int y){
-	Drawing.CommandHistory(key);
+	if(key==GLUT_KEY_UP||key==GLUT_KEY_DOWN)
+		Drawing.CommandHistory(key);
+	if(key==GLUT_KEY_RIGHT||key==GLUT_KEY_LEFT)
+		Drawing.CommandCursor(key);
 }
 

@@ -60,3 +60,15 @@ void MouseDrawMode(void){
 }
 
 
+void MNDrag(void){
+	if(M_Nodrag){
+		M_Nodrag = false;
+		MFLAG = false;
+	}
+	else {
+		M_Nodrag = true;
+		MFLAG = true;
+		Drawing.NewFreeHand();
+	}
+	MouseDrawMode();
+}

@@ -46,8 +46,8 @@ int main(int argc, char *argv[]){
 /******** Functions *********/
 
 void WindowCanvas(void){
-	glutInitWindowPosition(350,0);
-	glutInitWindowSize(809,500);
+	glutInitWindowPosition(900,0);
+	glutInitWindowSize(800,500);
 	glutInitDisplayMode(GLUT_RGBA);
 	glutCreateWindow("GRAPPA PAINT");
 	glutDisplayFunc(Display);

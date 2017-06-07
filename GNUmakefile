@@ -20,20 +20,20 @@ TARGETS  = $(basename $(OBJECTS))
 LIBRARY  = $(NAME).a
 
 all: $(LIBRARY) $(NAME)
-	@echo "  ---------------------------------------------  "
-	@echo "     Complete to create $(NAME) into $(EXE_DIR)  "
-	@echo "          Let's try do $(EXE_DIR)/$(NAME) !      "
-	@echo "  ---------------------------------------------  "
+	@echo "    —————————————————————————————————————————————  "
+	@echo "         Complete to create $(NAME) into $(EXE_DIR)"
+	@echo "            Let's try doing $(EXE_DIR)/$(NAME) !   "
+	@echo "    —————————————————————————————————————————————  "
 
 # make archives
 $(LIBRARY): $(OBJECTS)
 	ar ru $(LIB_DIR)/$(LIBRARY) $(OBJECTS)
 	ranlib $(LIB_DIR)/$(LIBRARY)
+	$(RM) $(OBJECTS) 
 
 # make execute file
 $(NAME): $(LIB_DIR)/$(LIBRARY)
 	$(COMPILER) -I$(INC_DIR) $(CFLAGS) $(FRAME) -o $(EXE_DIR)/$@ $^
-	$(RM) $(OBJECTS) 
 
 # macro for make object file
 define MACRO
