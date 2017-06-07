@@ -18,28 +18,33 @@
 #define FreeMAX 1000 /* Element of Free Hand */
 #define LineNum 1000 /* Maximum Line Number of Free Hand */
 #define CmdNum   100 /* Number of Stored Command */
-#define ArgNum    10 /* Number of Command Arguments */
 
 
 class GRAPPA{
 	private:
 		double Cmargin; /* Margin of Canvas (%) */
-		int WX,WY; /* Window Size */
-		int Px[FreeMAX][LineNum],Py[FreeMAX][LineNum]; /* X,Y Coordinate */
-		int Counter[LineNum],ID; /* Line Element Counter & Line ID */
-		bool SFLAG; /* Status Flag */
-		bool CFLAG; /* Command Line Flag */
+		int    WX,WY;   /* Window Size */
+		int    Px[FreeMAX][LineNum]; /* X Coordinate */ 
+		int    Py[FreeMAX][LineNum]; /* Y Coordinate */
+		int    Counter[LineNum];     /* Line Element Counter */
+		int    TmpCount[LineNum];    /* Temporary Line Element Counter */
+		int    LineID; /* Line ID */
+		int    TmpID;  /* Temporary Line ID */
+		bool   SFLAG;  /* Status Flag */
+		bool   CFLAG;  /* Command Line Flag */
 		double LineColor[3][LineNum]; /* Line Color [0,1,2]=[R,G,B] */
-		double LineWidth[LineNum]; /* Line Width */
-		char CommandString[CmdNum][64]; /* Input Command String */
-		int CmdID; /* Command ID */
-		int HstCounter; /* Go Back Counter for CommandHistory */
-		double CmdArg[ArgNum]; /* Command Arguments */
+		double LineWidth[LineNum];    /* Line Width */
+		char   CommandString[CmdNum][64]; /* Input Command String */
+		int    CmdID;      /* Command LineID */
+		int    CmdCursor;  /* Command Cursor */
+		int    HstCounter; /* Go Back Counter for CommandHistory */
 	public:
 		GRAPPA();
 		inline void Init(int WX, int XY);
+		inline void Reset();
 		inline void NewFreeHand();
 		inline void Undo();
+		inline void Redo();
 		inline void SetColor(double R, double G, double B);
 		inline void SetDefaultColor(double R, double G, double B);
 		inline void SetLineWidth(double w);
@@ -49,10 +54,13 @@ class GRAPPA{
 		inline void DrawFreeHand();
 		inline void Display();
 		inline void Status();
+		inline void SetLineID(int ID);
+		inline void BackLineID();
 		inline void CommandMode();
 		inline bool CommandFlag();
 		inline int  CommandStore(unsigned char key);
 		inline int  CommandHistory(int key);
+		inline void CommandCursor(int key);
 		inline bool RunCommand(const char *s0);
 		inline bool RunCommand(const char *s0, const char *s1);
 		inline bool RunCommand(const char *s0, const char *s1, const char *s2);
@@ -72,65 +80,82 @@ inline GRAPPA::GRAPPA(){
 			LineColor[i][j] = 0.0;
 		}
 		LineWidth[j] = 2.0;
-		Counter[j] = 0;
-	}	ID = 0;
-	SFLAG = true;
-	CmdID = 0;
+		Counter[j]   = 0;
+		TmpCount[j]  = 0;
+	}
+	LineID = 0;
+	TmpID  = 0;
+	SFLAG  = true;
+	CFLAG  = false;
+	CmdID  = 0;
+	CmdCursor  = 0;
 	HstCounter = 0;
-	for(int i=0;i<ArgNum;++i) CmdArg[i] = 0.0;
 }
 
 
 inline void GRAPPA::Init(int wx, int wy){
-
-	/** configuration of anti-aliasing **/
+	/* configuration of anti-aliasing */
 	glEnable(GL_LINE_SMOOTH);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	/************************************/
-
+	/* setting of canvas */
 	Cmargin = 2.0;
 	WX = wx;
 	WY = wy;
-//	for(int j=0;j<LineNum;++j){
-//		for(int i=0;i<FreeMAX;++i){
-//			Px[i][j] = 0;
-//			Py[i][j] = 0;
-//		}
-//		for(int i=0;i<3;++i){
-//			LineColor[i][j] = 0.0;
-//		}
-//		LineWidth[j] = 2.0;
-//		Counter[j] = 0;
-//	}
-//	ID = 0;
-//	SFLAG = true;
-//	CmdID = 0;
+}
+
+
+inline void GRAPPA::Reset(){
+	for(int j=0;j<LineNum;++j){
+		for(int i=0;i<FreeMAX;++i){
+			Px[i][j] = 0;
+			Py[i][j] = 0;
+		}
+		for(int i=0;i<3;++i){
+			LineColor[i][j] = 0.0;
+		}
+		LineWidth[j] = 2.0;
+		Counter[j]   = 0;
+		TmpCount[j]  = 0;
+	}
+	LineID = 0;
+	TmpID  = 0;
 }
 
 
 inline void GRAPPA::NewFreeHand(){
-	ID++;
-	if(LineNum<ID) ID = 0;
+	LineID++;
+	if(LineNum<LineID) LineID = 0;
 }
 
 
 inline void GRAPPA::Undo(){
-	Counter[ID] = 0;
-	if(0<ID) ID--;
+	TmpCount[LineID] = Counter[LineID];
+	Counter[LineID] = 0;
+	if(0<LineID) --LineID;
+}
+
+
+inline void GRAPPA::Redo(){
+	if(LineID+1<LineNum){
+		if(Px[0][LineID+1] && Py[0][LineID+1]){
+			++LineID;
+			Counter[LineID] = TmpCount[LineID];
+		}
+	}
 }
 
 
 inline void GRAPPA::SetColor(double R, double G, double B){
-	LineColor[0][ID] = R;
-	LineColor[1][ID] = G;
-	LineColor[2][ID] = B;
+	LineColor[0][LineID] = R;
+	LineColor[1][LineID] = G;
+	LineColor[2][LineID] = B;
 }
 
 
 inline void GRAPPA::SetDefaultColor(double R, double G, double B){
-	for(int i=ID+1;i<LineNum;++i){
+	for(int i=LineID+1;i<LineNum;++i){
 		LineColor[0][i] = R;
 		LineColor[1][i] = G;
 		LineColor[2][i] = B;
@@ -139,12 +164,12 @@ inline void GRAPPA::SetDefaultColor(double R, double G, double B){
 
 
 inline void GRAPPA::SetLineWidth(double w){
-	LineWidth[ID] = w;
+	LineWidth[LineID] = w;
 }
 
 
 inline void GRAPPA::SetDefaultLineWidth(double w){
-	for(int i=ID+1;i<LineNum;++i){
+	for(int i=LineID+1;i<LineNum;++i){
 		LineWidth[i] = w;
 	}
 }
@@ -162,20 +187,20 @@ inline void GRAPPA::DrawCanvas(){
 
 
 inline void GRAPPA::SetCoordinate(int x, int y){
-	if(Counter[ID]<FreeMAX){
-		Px[Counter[ID]][ID] = x;
-		Py[Counter[ID]][ID] = y;
-		Counter[ID]++;
+	if(Counter[LineID]<FreeMAX){
+		Px[Counter[LineID]][LineID] = x;
+		Py[Counter[LineID]][LineID] = y;
+		Counter[LineID]++;
 	}
 	else{
-		ID++;
-		if(LineNum<ID) ID = 0;
+		LineID++;
+		if(LineNum<LineID) LineID = 0;
 	}
 }
 
 
 inline void GRAPPA::DrawFreeHand(){
-	for(int j=0;j<=ID;++j){
+	for(int j=0;j<=LineID;++j){
 		glPointSize(LineWidth[j]);
 		glLineWidth(LineWidth[j]);
 		glColor3d(LineColor[0][j],LineColor[1][j],LineColor[2][j]);
@@ -206,19 +231,47 @@ inline void GRAPPA::DrawFreeHand(){
 
 inline void GRAPPA::Display(){
 	glColor3d(0.0,0.0,0.0);
+	char s[128];
 	if(SFLAG){
-		char s[128];
-		int x = (Counter[ID]>1)? Px[Counter[ID]-1][ID]:0;
-		int y = (Counter[ID]>1)? Py[Counter[ID]-1][ID]:0;
+		int x = (Counter[LineID]>1)? Px[Counter[LineID]-1][LineID]:0;
+		int y = (Counter[LineID]>1)? Py[Counter[LineID]-1][LineID]:0;
 		sprintf(s,"[%d,%d]",x,y);
 		glDrawString(s,0.03,0.95);
-		sprintf(s,"Line No. %d Length %d",ID,Counter[ID]);
+		sprintf(s,"Line No. %d Length %d",LineID,Counter[LineID]);
 		glDrawString(s,0.03,0.92);
 	}
 	if(CFLAG){
-		char s[128];
-		sprintf(s,":%s",CommandString[CmdID]);
+		static unsigned char count = 0;
+		static bool flag = false;
+		if(flag){
+			sprintf(s,":%s",CommandString[CmdID]);
+			if(count%32==0) flag = false; 
+		}
+		else{
+			memset(s,'\0',sizeof(s));
+			sprintf(s,":%s",CommandString[CmdID]);
+			int size = strlen(s);
+			memset(s+size-CmdCursor,'|',1);
+			if(count%32==0) flag = true;
+		}
+		++count;
 		glDrawString(s,0.03,0.05);
+	}
+}
+
+
+inline void GRAPPA::SetLineID(int ID){
+	if(!TmpID && ID<LineID){
+		TmpID  = LineID;
+		LineID = ID;
+	}
+}
+
+
+inline void GRAPPA::BackLineID(){
+	if(TmpID){
+		LineID = TmpID;
+		TmpID  = 0;
 	}
 }
 
@@ -243,26 +296,46 @@ inline bool GRAPPA::CommandFlag(){
 inline int GRAPPA::CommandStore(unsigned char key){
 	int size = strlen(CommandString[CmdID]);
 	if(CFLAG){
-		if(key == 127){ //delete key
+		if(key == 127){//delete key
 			if(0<size)
-				memset(CommandString[CmdID]+size-1,'\0',1);
+				if(CmdCursor){
+					if(CmdCursor<size){
+						for(int i=size-CmdCursor;i<size;++i){
+							CommandString[CmdID][i-1] = CommandString[CmdID][i];
+						}
+						CommandString[CmdID][size-1] = '\0';
+					}
+				}
+				else
+					memset(CommandString[CmdID]+size-1,'\0',1);
 			else{ 
 				HstCounter = 0;
 				CFLAG = false;
 			}	
 		}
-		else if(key == 13){ //return key
+		else if(key == 13){//return key
 			if(0<size){
 				if(HstCounter) HstCounter = 0;
+				if(CmdCursor)  CmdCursor  = 0;
 				if(CmdID<CmdNum) ++CmdID;
 				else CmdID = 0;
 				CFLAG = false;
 			}
 		}
 		else{
-			char s[4];
-			sprintf(s,"%c",key);
-			if(size<32) strcat(CommandString[CmdID],s);
+			if(CmdCursor){
+				char tmp[128];
+				for(int i=0;i<CmdCursor;++i)
+					tmp[i] = CommandString[CmdID][i+size-CmdCursor];
+				memset(CommandString[CmdID]+size-CmdCursor,key,1);
+				memset(CommandString[CmdID]+size-CmdCursor+1,'\0',1);
+				if(size<32) sprintf(CommandString[CmdID],"%s%s",CommandString[CmdID],tmp);
+			}
+			else{
+				char s[4];
+				sprintf(s,"%c",key);
+				if(size<32) strcat(CommandString[CmdID],s);
+			}
 		}
 	}
 	return size;
@@ -298,9 +371,29 @@ inline int GRAPPA::CommandHistory(int key){
 }
 
 
+inline void GRAPPA::CommandCursor(int key){
+	if(CFLAG){
+		switch(key){
+			case GLUT_KEY_RIGHT://right-arrow key
+				--CmdCursor;
+				if(CmdCursor<0) CmdCursor = 0;
+				break;
+			case GLUT_KEY_LEFT://left-arrow key
+				++CmdCursor;
+				if((int)strlen(CommandString[CmdID])<CmdCursor)
+					CmdCursor = strlen(CommandString[CmdID])-1;
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+
 inline bool GRAPPA::RunCommand(const char *s0){
 	bool match = false;
 	if(!strcmp(CommandString[CmdID],s0)) match = true;
+	if(match) printf("Command:%s\n",CommandString[CmdID]);
 	return match;
 }
 
@@ -309,6 +402,7 @@ inline bool GRAPPA::RunCommand(const char *s0, const char *s1){
 	bool match = false;
 	if(!strcmp(CommandString[CmdID],s0)) match = true;
 	if(!strcmp(CommandString[CmdID],s1)) match = true;
+	if(match) printf("Command:%s\n",CommandString[CmdID]);
 	return match;
 }
 
@@ -318,6 +412,7 @@ inline bool GRAPPA::RunCommand(const char *s0, const char *s1, const char *s2){
 	if(!strcmp(CommandString[CmdID],s0)) match = true;
 	if(!strcmp(CommandString[CmdID],s1)) match = true;
 	if(!strcmp(CommandString[CmdID],s2)) match = true;
+	if(match) printf("Command:%s\n",CommandString[CmdID]);
 	return match;
 }
 

@@ -12,26 +12,21 @@ extern GRAPPA Drawing;
 void MouseDrawMode(void);
 void KeyboardMode(void);
 void InputKey(unsigned char key, int x, int y);
+void MNDrag(void);
 
 void KeyboardShortcut(unsigned char key, int x, int y){
 	switch(key){
 		case 'u': /* Undo */
 			Drawing.Undo();
 			break;
+		case 'r': /* Redo */
+			Drawing.Redo();
+			break;
 		case 's':
 			Drawing.Status();
 			break;
 		case 'n':
-			if(M_Nodrag){
-				M_Nodrag = false;
-				MFLAG = false;
-			}
-			else {
-				M_Nodrag = true;
-				MFLAG = true;
-				Drawing.NewFreeHand();
-			}
-			MouseDrawMode();
+			MNDrag();
 			break;
 		case ':':
 			Drawing.CommandMode();
