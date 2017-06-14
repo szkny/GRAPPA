@@ -67,12 +67,12 @@ void Controler(void){
 void Display(void){
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	Drawing.DrawPixel();
 	Drawing.DrawCanvas();
 	Drawing.DrawFreeHand();
 	Drawing.Display();
 
 	glutIdleFunc(glutPostRedisplay);
-
 	glFlush();
 }
 

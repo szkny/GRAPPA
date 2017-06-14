@@ -46,4 +46,4 @@ $(foreach var,$(TARGETS),$(eval $(call MACRO,$(var))))
 #make clean
 .PHONY: clean
 clean: 
-	$(RM) $(OBJECTS) 
+	$(RM) $(OBJECTS) $(LIB_DIR)/$(LIBRARY) $(EXE_DIR)/$(NAME)

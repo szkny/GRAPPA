@@ -22,6 +22,12 @@ void KeyboardShortcut(unsigned char key, int x, int y){
 		case 'r': /* Redo */
 			Drawing.Redo();
 			break;
+		case 'e': /* Erase */
+			Drawing.EraseLine();
+			break;
+		case 'p': /* Pixel Mode */
+			Drawing.PixelMode();
+			break;
 		case 's':
 			Drawing.Status();
 			break;

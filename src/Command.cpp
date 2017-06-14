@@ -21,38 +21,50 @@ void Commands(){
 	if(Drawing.RunCommand("q","quit","exit"))
 		exit(0);
 
-	else if(Drawing.RunCommand("u","undo"))
+	else if(Drawing.RunCommand("undo"))
 		Drawing.Undo();
 
-	else if(Drawing.RunCommand("r","redo"))
+	else if(Drawing.RunCommand("redo"))
 		Drawing.Redo();
+	
+	else if(Drawing.RunCommand("erase"))
+		Drawing.EraseLine();
 
-	else if(Drawing.RunCommand("n","nodrag"))
+	else if(Drawing.RunCommand("nodrag"))
 		MNDrag();
 	
-	else if(Drawing.RunCommand("s","status"))
+	else if(Drawing.RunCommand("status"))
 		Drawing.Status();
 
 	else if(Drawing.RunCommand("reset"))
 		Drawing.Reset();
 
-	else if(Drawing.RunCommand("cor"))
-		Drawing.SetColor(1.0,0.0,0.0);
+	else if(Drawing.RunCommand("setid",&Arg1))
+		Drawing.SetLineID(Arg1);
 
-	else if(Drawing.RunCommand("cog"))
-		Drawing.SetColor(0.0,1.0,0.0);
-
-	else if(Drawing.RunCommand("cob"))
-		Drawing.SetColor(0.0,0.0,1.0);
-
-	else if(Drawing.RunCommand("coy"))
-		Drawing.SetColor(1.0,1.0,0.0);
+	else if(Drawing.RunCommand("backid"))
+		Drawing.BackLineID();
+		
+	else if(Drawing.RunCommand("cco",&Arg1,&Arg2,&Arg3))
+		Drawing.SetCanvasColor(Arg1,Arg2,Arg3);
 
 	else if(Drawing.RunCommand("co",&Arg1,&Arg2,&Arg3))
-		Drawing.SetColor(Arg1,Arg2,Arg3);
+		Drawing.SetLineColor(Arg1,Arg2,Arg3);
 
 	else if(Drawing.RunCommand("dco",&Arg1,&Arg2,&Arg3))
-		Drawing.SetDefaultColor(Arg1,Arg2,Arg3);
+		Drawing.SetDefaultLineColor(Arg1,Arg2,Arg3);
+
+	else if(Drawing.RunCommand("cor"))
+		Drawing.SetLineColor(1.0,0.0,0.0);
+
+	else if(Drawing.RunCommand("cog"))
+		Drawing.SetLineColor(0.0,1.0,0.0);
+
+	else if(Drawing.RunCommand("cob"))
+		Drawing.SetLineColor(0.0,0.0,1.0);
+
+	else if(Drawing.RunCommand("coy"))
+		Drawing.SetLineColor(1.0,1.0,0.0);
 
 	else if(Drawing.RunCommand("lw",&Arg1))
 		Drawing.SetLineWidth(Arg1);
@@ -60,11 +72,12 @@ void Commands(){
 	else if(Drawing.RunCommand("dlw",&Arg1))
 		Drawing.SetDefaultLineWidth(Arg1);
 
-	else if(Drawing.RunCommand("setid",&Arg1))
-		Drawing.SetLineID(Arg1);
+	else if(Drawing.RunCommand("ps",&Arg1))
+		Drawing.SetPixelSize(Arg1);
 
-	else if(Drawing.RunCommand("backid"))
-		Drawing.BackLineID();
+	else if(Drawing.RunCommand("p","pixel"))
+		Drawing.PixelMode();
+
 }
 
 
@@ -77,6 +90,9 @@ void InputKey(unsigned char key, int x, int y){
 		Commands();
 		Drawing.CommandStore(key);
 		KeyboardMode();
+	}
+	else if(key == 9){ //tab key
+		;
 	}
 	else{
 		Drawing.CommandStore(key);
