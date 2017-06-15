@@ -3,7 +3,6 @@
 
 /*****************************/
 
-
 #include<iostream>
 #include<fstream>
 #include<stdio.h>
@@ -14,6 +13,7 @@
 
 #include<GL/glut.h>
 #include<MyGLUT.h>
+#include<Colors.h>
 
 #define FreeMAX 1000 /* Element of Free Hand */
 #define LineNum 1000 /* Maximum Line Number of Free Hand */
@@ -34,10 +34,12 @@ class GRAPPA{
 		int    TmpCount[LineNum];    /* Temporary Line Element Counter */
 		int    LineID; /* Line ID */
 		int    TmpID;  /* Temporary Line ID */
-		bool   PFLAG;  /* Pixel Mode Flag */
-		bool   EFLAG;  /* Eraser Flag */
-		bool   SFLAG;  /* Status Flag */
-		bool   CFLAG;  /* Command Line Flag */
+		bool   CBFLAG; /* Color Bar Flag */
+		bool   PMFLAG; /* Pixel Mode Flag */
+		bool   ERFLAG; /* Eraser Flag */
+		bool   STFLAG; /* Status Flag */
+		bool   CMFLAG; /* Command Line Flag */
+		double ColorBarWidth; /* Width of Color Bar */
 		double LineColor[3][LineNum]; /* Line Color [0,1,2]=[R,G,B] */
 		double LineWidth[LineNum];    /* Line Width */
 		char   CommandString[CmdNum][64]; /* Input Command String */
@@ -55,6 +57,9 @@ class GRAPPA{
 		inline void Undo();
 		inline void Redo();
 		inline void EraseLine();
+		inline bool ColorBarFlag();
+		inline void ColorBarMode();
+		inline void DrawColorBar();
 		inline void SetCanvasColor(double R, double G, double B);
 		inline void SetLineColor(double R, double G, double B);
 		inline void SetDefaultLineColor(double R, double G, double B);
@@ -106,12 +111,14 @@ inline GRAPPA::GRAPPA(){
 			for(int k=0;k<Ypixel;++k)
 				Pixel[i][j][k] = 1.0;
 	}
+	ColorBarWidth = 3.0;
 	LineID = 0;
 	TmpID  = 0;
-	PFLAG  = false;
-	EFLAG  = false;
-	SFLAG  = true;
-	CFLAG  = false;
+	CBFLAG = false;
+	PMFLAG = false;
+	ERFLAG = false;
+	STFLAG = true;
+	CMFLAG = false;
 	CmdID  = 0;
 	CmdCursor  = 0;
 	HstCounter = 0;
@@ -158,11 +165,13 @@ inline void GRAPPA::Reset(){
 
 
 inline void GRAPPA::NewFreeHand(){
-	if(!TmpID){
-		LineID++;
-		if(LineNum<LineID) LineID = 0;
-		Counter[LineID] = 0;
-		if(EFLAG) ++PixelEraserCounter;
+	if(!CBFLAG){
+		if(!TmpID){
+			LineID++;
+			if(LineNum<LineID) LineID = 0;
+			Counter[LineID] = 0;
+			if(ERFLAG) ++PixelEraserCounter;
+		}
 	}
 }
 
@@ -190,6 +199,39 @@ inline void GRAPPA::EraseLine(){
 }
 
 
+inline bool GRAPPA::ColorBarFlag(){
+	return CBFLAG;
+}
+
+
+inline void GRAPPA::ColorBarMode(){
+	if(CBFLAG){
+		CBFLAG = false;
+		printf("\n");
+	}
+	else CBFLAG = true;
+}
+
+
+inline void GRAPPA::DrawColorBar(){
+	if(CBFLAG){
+		double hmax = 1.0;
+		double hbin = hmax/200;
+		glBegin(GL_QUADS);
+		for(double h=0.0;h<hmax;h+=hbin){
+			hue2rgb hue(h,hmax);
+			glColor3d(hue.R(),hue.G(),hue.B());
+			double yoff = Cmargin+5;
+			glVertex2d(h     ,(yoff)/100);
+			glVertex2d(h+hbin,(yoff)/100);
+			glVertex2d(h+hbin,(yoff+ColorBarWidth)/100);
+			glVertex2d(h     ,(yoff+ColorBarWidth)/100);
+		}
+		glEnd();
+	}
+}
+
+
 inline void GRAPPA::SetCanvasColor(double R, double G, double B){
 	for(int j=0;j<Ypixel;++j){
 		for(int i=0;i<Xpixel;++i){
@@ -207,7 +249,10 @@ inline void GRAPPA::SetCanvasColor(double R, double G, double B){
 	CanvasColor[0] = R;
 	CanvasColor[1] = G;
 	CanvasColor[2] = B;
-	SetDefaultLineColor(1.0-R,1.0-G,1.0-B);
+	if(R==G && G==B)
+		SetDefaultLineColor(0.5-R,0.5-G,1.0-B);
+	else
+		SetDefaultLineColor(1.0-R,1.0-G,1.0-B);
 }
 
 inline void GRAPPA::SetLineColor(double R, double G, double B){
@@ -250,24 +295,36 @@ inline void GRAPPA::SetPixelSize(int size){
 
 
 inline void GRAPPA::SetCoordinate(int x, int y){
-	if(!TmpID){
-		if(Counter[LineID]<FreeMAX){
-			Px[Counter[LineID]][LineID] = x;
-			Py[Counter[LineID]][LineID] = y;
-			Counter[LineID]++;
+	if(CBFLAG){ /* Set Line Color by ColorBar */
+		double yoff = Cmargin+5;
+		if(WY*(100-yoff-ColorBarWidth)/100.0<y&&y<WY*(100-yoff)/100.0){
+			hue2rgb C(x,WX);
+			SetLineColor(C.R(),C.G(),C.B());
+			SetDefaultLineColor(C.R(),C.G(),C.B());
+			printf("\rR:%f\tG:%f\tB:%f",C.R(),C.G(),C.B());
+			fflush(stdout);
 		}
-		else{
-			LineID++;
-			if(LineNum<LineID) LineID = 0;
-			if(EFLAG) ++PixelEraserCounter;
+	}
+	else{ /* Store Coordinate */
+		if(!TmpID){
+			if(Counter[LineID]<FreeMAX){
+				Px[Counter[LineID]][LineID] = x;
+				Py[Counter[LineID]][LineID] = y;
+				Counter[LineID]++;
+			}
+			else{
+				LineID++;
+				if(LineNum<LineID) LineID = 0;
+				if(ERFLAG) ++PixelEraserCounter;
+			}
+			FillPixel();
 		}
-		FillPixel();
 	}
 }
 
 
 inline void GRAPPA::DrawCanvas(){
-	if(!PFLAG){
+	if(!PMFLAG){
 		glColor3d(CanvasColor[0],CanvasColor[1],CanvasColor[2]);
 		glBegin(GL_QUADS);
 		glVertex2d(Cmargin/100,Cmargin/100);
@@ -280,7 +337,7 @@ inline void GRAPPA::DrawCanvas(){
 
 
 inline void GRAPPA::DrawFreeHand(){
-	if(!PFLAG){
+	if(!PMFLAG){
 		for(int j=0;j<=LineID;++j){
 			glPointSize(LineWidth[j]);
 			glLineWidth(LineWidth[j]);
@@ -312,8 +369,8 @@ inline void GRAPPA::DrawFreeHand(){
 
 
 inline void GRAPPA::PixelMode(){
-	if(PFLAG) PFLAG = false;
-	else      PFLAG = true;
+	if(PMFLAG) PMFLAG = false;
+	else      PMFLAG = true;
 }
 
 
@@ -369,11 +426,11 @@ inline void GRAPPA::FillPixel(){
 
 
 inline void GRAPPA::PixelEraser(){
-	if(PFLAG){
+	if(PMFLAG){
 		static int TmpPixelSize = 2;
 		static double TmpColor[3];
-		if(!EFLAG){ // Eraser ON
-			EFLAG = true;
+		if(!ERFLAG){ // Eraser ON
+			ERFLAG = true;
 			TmpPixelSize = PixelSize;
 			PixelSize = 10;
 			for(int i=0;i<3;++i)
@@ -381,7 +438,7 @@ inline void GRAPPA::PixelEraser(){
 			SetDefaultLineColor(CanvasColor[0],CanvasColor[1],CanvasColor[2]);
 		}
 		else{ // Eraser OFF
-			EFLAG = false;
+			ERFLAG = false;
 			if(PixelEraserCounter){
 				for(int i=0;i<PixelEraserCounter;++i) Undo();
 				PixelEraserCounter = 0;
@@ -394,12 +451,12 @@ inline void GRAPPA::PixelEraser(){
 
 
 inline bool GRAPPA::PixelEraserFlag(){
-	return EFLAG;
+	return ERFLAG;
 }
 
 
 inline void GRAPPA::DrawPixel(){
-	if(PFLAG){
+	if(PMFLAG){
 		glBegin(GL_QUADS);
 		for(int j=0;j<Ypixel;++j){
 			for(int i=0;i<Xpixel;++i){
@@ -416,24 +473,29 @@ inline void GRAPPA::DrawPixel(){
 
 
 inline void GRAPPA::Display(){
-	glColor3d(1.0-CanvasColor[0],1.0-CanvasColor[1],1.0-CanvasColor[2]);
+	if(CanvasColor[0]==CanvasColor[1]&&CanvasColor[1]==CanvasColor[2])
+		glColor3d(0.5-CanvasColor[0],0.5-CanvasColor[1],1.0-CanvasColor[2]);
+	else
+		glColor3d(1.0-CanvasColor[0],1.0-CanvasColor[1],1.0-CanvasColor[2]);
 	char s[128];
-	if(SFLAG){
+	if(STFLAG){
 		int x = (Counter[LineID]>1)? Px[Counter[LineID]-1][LineID]:0;
 		int y = (Counter[LineID]>1)? Py[Counter[LineID]-1][LineID]:0;
 		sprintf(s,"[%d,%d]",x,y);
 		glDrawString(s,(Cmargin+1)/100,(100-Cmargin-3)/100);
 		sprintf(s,"Line No. %d Length %d",LineID,Counter[LineID]);
 		glDrawString(s,(Cmargin+1)/100,(100-Cmargin-6)/100);
-	}
-	if(PFLAG)
-		if(EFLAG)
-			glDrawString("Mode : Pixel(Eraser)",(Cmargin+1)/100,(100-Cmargin-9)/100);
+	
+		if(PMFLAG){
+			if(ERFLAG)
+				glDrawString("Mode : Pixel(Eraser)",(Cmargin+1)/100,(100-Cmargin-9)/100);
+			else
+				glDrawString("Mode : Pixel",(Cmargin+1)/100,(100-Cmargin-9)/100);
+		}
 		else
-			glDrawString("Mode : Pixel",(Cmargin+1)/100,(100-Cmargin-9)/100);
-	else
-		glDrawString("Mode : GLUT Line",(Cmargin+1)/100,(100-Cmargin-9)/100);
-	if(CFLAG){
+			glDrawString("Mode : GLUT Line",(Cmargin+1)/100,(100-Cmargin-9)/100);
+	}
+	if(CMFLAG){
 		static unsigned char count = 0;
 		static bool flag = false;
 		if(flag){
@@ -470,25 +532,25 @@ inline void GRAPPA::BackLineID(){
 
 
 inline void GRAPPA::Status(){
-	if(SFLAG) SFLAG = false;
-	else SFLAG = true;
+	if(STFLAG) STFLAG = false;
+	else STFLAG = true;
 }
 
 
 inline void GRAPPA::CommandMode(){
-	if(CFLAG) CFLAG = false;
-	else CFLAG = true;
+	if(CMFLAG) CMFLAG = false;
+	else CMFLAG = true;
 }
 
 
 inline bool GRAPPA::CommandFlag(){
-	return CFLAG;
+	return CMFLAG;
 }
 
 
 inline int GRAPPA::CommandStore(unsigned char key){
 	int size = strlen(CommandString[CmdID]);
-	if(CFLAG){
+	if(CMFLAG){
 		if(key == 127){//delete key
 			if(0<size)
 				if(CmdCursor){
@@ -502,7 +564,7 @@ inline int GRAPPA::CommandStore(unsigned char key){
 				else memset(CommandString[CmdID]+size-1,'\0',1);
 			else{ 
 				HstCounter = 0;
-				CFLAG = false;
+				CMFLAG = false;
 			}	
 		}
 		else if(key == 13){//return key
@@ -514,7 +576,7 @@ inline int GRAPPA::CommandStore(unsigned char key){
 					CmdID = 0;
 					memset(CommandString[CmdID],'\0',sizeof(CommandString[CmdID]));
 				}
-				CFLAG = false;
+				CMFLAG = false;
 			}
 		}
 		else{
@@ -538,7 +600,7 @@ inline int GRAPPA::CommandStore(unsigned char key){
 
 
 inline int GRAPPA::CommandHistory(int key){
-	if(CFLAG){
+	if(CMFLAG){
 		switch(key){
 			case GLUT_KEY_UP://up-arrow key
 				if(0<CmdID-HstCounter){
@@ -567,7 +629,7 @@ inline int GRAPPA::CommandHistory(int key){
 
 
 inline void GRAPPA::CommandCursor(int key){
-	if(CFLAG){
+	if(CMFLAG){
 		switch(key){
 			case GLUT_KEY_RIGHT://right-arrow key
 				--CmdCursor;
