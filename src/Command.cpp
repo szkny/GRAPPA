@@ -63,6 +63,9 @@ void Commands(){
 	else if(Drawing.RunCommand("coy"))
 		Drawing.SetLineColor(1.0,1.0,0.0);
 
+	else if(Drawing.RunCommand("cb"))
+		Drawing.ColorBarMode();
+
 	else if(Drawing.RunCommand("lw",&Arg1))
 		Drawing.SetLineWidth(Arg1);
 

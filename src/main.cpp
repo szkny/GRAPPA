@@ -70,6 +70,7 @@ void Display(void){
 	Drawing.DrawPixel();
 	Drawing.DrawCanvas();
 	Drawing.DrawFreeHand();
+	Drawing.DrawColorBar();
 	Drawing.Display();
 
 	glutIdleFunc(glutPostRedisplay);
