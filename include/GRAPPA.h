@@ -35,6 +35,7 @@ class GRAPPA{
 		int    LineID; /* Line ID */
 		int    TmpID;  /* Temporary Line ID */
 		bool   PFLAG;  /* Pixel Mode Flag */
+		bool   EFLAG;  /* Eraser Flag */
 		bool   SFLAG;  /* Status Flag */
 		bool   CFLAG;  /* Command Line Flag */
 		double LineColor[3][LineNum]; /* Line Color [0,1,2]=[R,G,B] */
@@ -45,6 +46,7 @@ class GRAPPA{
 		int    HstCounter; /* Go Back Counter for CommandHistory */
 		double Pixel[3][Xpixel][Ypixel]; /* [RGB][X][Y] */
 		int    PixelSize; /* Size of Pixel */
+		int    PixelEraserCounter; /* Counter of Pixel Eraser */
 	public:
 		GRAPPA();
 		inline void Init(int WX, int XY);
@@ -62,9 +64,10 @@ class GRAPPA{
 		inline void SetCoordinate(int x, int y);
 		inline void DrawCanvas();
 		inline void DrawFreeHand();
-		inline bool PixelFlag();
 		inline void PixelMode();
 		inline void FillPixel();
+		inline void PixelEraser();
+		inline bool PixelEraserFlag();
 		inline void DrawPixel();
 		inline void Display();
 		inline void Status();
@@ -106,12 +109,14 @@ inline GRAPPA::GRAPPA(){
 	LineID = 0;
 	TmpID  = 0;
 	PFLAG  = false;
+	EFLAG  = false;
 	SFLAG  = true;
 	CFLAG  = false;
 	CmdID  = 0;
 	CmdCursor  = 0;
 	HstCounter = 0;
 	PixelSize  = 1;
+	PixelEraserCounter = 0;
 }
 
 
@@ -157,6 +162,7 @@ inline void GRAPPA::NewFreeHand(){
 		LineID++;
 		if(LineNum<LineID) LineID = 0;
 		Counter[LineID] = 0;
+		if(EFLAG) ++PixelEraserCounter;
 	}
 }
 
@@ -253,6 +259,7 @@ inline void GRAPPA::SetCoordinate(int x, int y){
 		else{
 			LineID++;
 			if(LineNum<LineID) LineID = 0;
+			if(EFLAG) ++PixelEraserCounter;
 		}
 		FillPixel();
 	}
@@ -304,11 +311,6 @@ inline void GRAPPA::DrawFreeHand(){
 }
 
 
-inline bool GRAPPA::PixelFlag(){
-	return PFLAG;
-}
-
-
 inline void GRAPPA::PixelMode(){
 	if(PFLAG) PFLAG = false;
 	else      PFLAG = true;
@@ -355,7 +357,7 @@ inline void GRAPPA::FillPixel(){
 				if(whilemax<whilecount) break;
 			}
 		}
-		else{
+		else{ //v==0
 			PixelBlottingOut(Px[c][LineID],Py[c][LineID]);
 		}
 	}
@@ -364,6 +366,36 @@ inline void GRAPPA::FillPixel(){
 	}
 }
 #undef PixelBlottingOut
+
+
+inline void GRAPPA::PixelEraser(){
+	if(PFLAG){
+		static int TmpPixelSize = 2;
+		static double TmpColor[3];
+		if(!EFLAG){ // Eraser ON
+			EFLAG = true;
+			TmpPixelSize = PixelSize;
+			PixelSize = 10;
+			for(int i=0;i<3;++i)
+				TmpColor[i] = LineColor[i][LineID];
+			SetDefaultLineColor(CanvasColor[0],CanvasColor[1],CanvasColor[2]);
+		}
+		else{ // Eraser OFF
+			EFLAG = false;
+			if(PixelEraserCounter){
+				for(int i=0;i<PixelEraserCounter;++i) Undo();
+				PixelEraserCounter = 0;
+			}
+			PixelSize = TmpPixelSize;
+			SetDefaultLineColor(TmpColor[0],TmpColor[1],TmpColor[2]);
+		}
+	}
+}
+
+
+inline bool GRAPPA::PixelEraserFlag(){
+	return EFLAG;
+}
 
 
 inline void GRAPPA::DrawPixel(){
@@ -394,6 +426,13 @@ inline void GRAPPA::Display(){
 		sprintf(s,"Line No. %d Length %d",LineID,Counter[LineID]);
 		glDrawString(s,(Cmargin+1)/100,(100-Cmargin-6)/100);
 	}
+	if(PFLAG)
+		if(EFLAG)
+			glDrawString("Mode : Pixel(Eraser)",(Cmargin+1)/100,(100-Cmargin-9)/100);
+		else
+			glDrawString("Mode : Pixel",(Cmargin+1)/100,(100-Cmargin-9)/100);
+	else
+		glDrawString("Mode : GLUT Line",(Cmargin+1)/100,(100-Cmargin-9)/100);
 	if(CFLAG){
 		static unsigned char count = 0;
 		static bool flag = false;

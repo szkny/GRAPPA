@@ -27,9 +27,6 @@ void Commands(){
 	else if(Drawing.RunCommand("redo"))
 		Drawing.Redo();
 	
-	else if(Drawing.RunCommand("erase"))
-		Drawing.EraseLine();
-
 	else if(Drawing.RunCommand("nodrag"))
 		MNDrag();
 	
@@ -72,11 +69,14 @@ void Commands(){
 	else if(Drawing.RunCommand("dlw",&Arg1))
 		Drawing.SetDefaultLineWidth(Arg1);
 
+	else if(Drawing.RunCommand("p","pixel"))
+		Drawing.PixelMode();
+
 	else if(Drawing.RunCommand("ps",&Arg1))
 		Drawing.SetPixelSize(Arg1);
 
-	else if(Drawing.RunCommand("p","pixel"))
-		Drawing.PixelMode();
+	else if(Drawing.RunCommand("eraser"))
+		Drawing.PixelEraser();
 
 }
 
