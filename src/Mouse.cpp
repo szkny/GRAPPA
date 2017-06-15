@@ -21,6 +21,8 @@ void MouseClick(int button, int state, int x, int y){
 				}
 				if(state==GLUT_DOWN){
 					MFLAG = false;
+					if(Drawing.PixelEraserFlag())
+						Drawing.PixelEraser();
 				}
 			}
 			else{
@@ -30,6 +32,8 @@ void MouseClick(int button, int state, int x, int y){
 				}
 				if(state==GLUT_UP){
 					MFLAG = false;
+					if(Drawing.PixelEraserFlag())
+						Drawing.PixelEraser();
 				}
 			}
 			break;
