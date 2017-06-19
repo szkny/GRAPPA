@@ -36,20 +36,20 @@ void Commands(){
 	else if(Drawing.RunCommand("reset"))
 		Drawing.Reset();
 
-	else if(Drawing.RunCommand("setid",&Arg1))
-		Drawing.SetLineID(Arg1);
-
-	else if(Drawing.RunCommand("backid"))
-		Drawing.BackLineID();
+	else if(Drawing.RunCommand("mv"))
+		Drawing.SetDrawMode(MLINEMOVE);
+		
+	else if(Drawing.RunCommand("rotate"))
+		Drawing.SetDrawMode(MLINEROTATE);
 		
 	else if(Drawing.RunCommand("co"))
-		Drawing.SetDrawMode(DCOLORBARLINE);
+		Drawing.SetDrawMode(MCOLORBARLINE);
 
 	else if(Drawing.RunCommand("co",&Arg1,&Arg2,&Arg3))
 		Drawing.SetLineColor(Arg1,Arg2,Arg3);
 
 	else if(Drawing.RunCommand("cco"))
-		Drawing.SetDrawMode(DCOLORBARCANVAS);
+		Drawing.SetDrawMode(MCOLORBARCANVAS);
 
 	else if(Drawing.RunCommand("cco",&Arg1,&Arg2,&Arg3))
 		Drawing.SetCanvasColor(Arg1,Arg2,Arg3);
@@ -85,10 +85,19 @@ void Commands(){
 		Drawing.PixelEraser();
 
 	else if(Drawing.RunCommand("circle"))
-		Drawing.SetDrawMode(DCIRCLE);
+		Drawing.SetDrawMode(MCIRCLE);
 
 	else if(Drawing.RunCommand("square"))
-		Drawing.SetDrawMode(DSQUARE);
+		Drawing.SetDrawMode(MSQUARE);
+
+	else if(Drawing.RunCommand("polygon",&Arg1))
+		Drawing.SetDrawMode(MPOLYGON,Arg1);
+
+	else if(Drawing.RunCommand("line"))
+		Drawing.SetDrawMode(MSTRAIGHTLINE);
+
+	else if(Drawing.RunCommand("rand"))
+		Drawing.SetDrawMode(MRANDOM);
 
 }
 

@@ -21,10 +21,9 @@ void MouseClick(int button, int state, int x, int y){
 				}
 				if(state==GLUT_DOWN){
 					MFLAG = false;
+					Drawing.SetDrawMode(MFREEHAND);
 					if(Drawing.PixelEraserFlag())
 						Drawing.PixelEraser();
-					if(Drawing.CurrentDrawMode()!=DFREEHAND)
-						Drawing.SetDrawMode(DFREEHAND);
 				}
 			}
 			else{
@@ -34,10 +33,9 @@ void MouseClick(int button, int state, int x, int y){
 				}
 				if(state==GLUT_UP){
 					MFLAG = false;
+					Drawing.SetDrawMode(MFREEHAND);
 					if(Drawing.PixelEraserFlag())
 						Drawing.PixelEraser();
-					if(Drawing.CurrentDrawMode()!=DFREEHAND)
-						Drawing.SetDrawMode(DFREEHAND);
 				}
 			}
 			break;

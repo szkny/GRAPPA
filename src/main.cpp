@@ -2,7 +2,7 @@
 *
 *	main source for GRAPPA PAINT  
 *		(c) M.Haroon, S.Suzuki 2017.4.26 (origin)
-*					patch ———— 2017.5.28 (vol0.2.0)
+*					patch ———— 2017.6.19 (vol0.2.2)
 */
 
 #include<stdio.h>
@@ -69,9 +69,9 @@ void Display(void){
 
 	Drawing.DrawPixel();
 	Drawing.DrawCanvas();
-	Drawing.DrawFreeHand();
+	Drawing.DrawGlutLine();
 	Drawing.DrawColorBar();
-	Drawing.Display();
+	Drawing.DrawDisplay();
 
 	glutIdleFunc(glutPostRedisplay);
 	glFlush();

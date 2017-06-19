@@ -3,14 +3,6 @@
 
 /*****************************/
 
-#include<iostream>
-#include<fstream>
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
-#include<time.h>
-#include<string.h>
-
 #include<GL/glut.h>
 #include<MyGLUT.h>
 #include<Colors.h>
@@ -23,12 +15,17 @@
 #define Xpixel 200
 #define Ypixel 125
 
-/* Draw Mode */
-#define DFREEHAND       0
-#define DCOLORBARLINE   1
-#define DCOLORBARCANVAS 2
-#define DCIRCLE         3
-#define DSQUARE         4
+/* Mouse Mode */
+#define MFREEHAND       0
+#define MCOLORBARLINE   1
+#define MCOLORBARCANVAS 2
+#define MCIRCLE         3
+#define MSQUARE         4
+#define MPOLYGON        5
+#define MSTRAIGHTLINE   6
+#define MRANDOM         7
+#define MLINEMOVE       8
+#define MLINEROTATE     9
 
 /* Circle Samples */
 #define CircleSample 50
@@ -43,8 +40,8 @@ class GRAPPA{
 		int    Counter[LineNum];     /* Line Element Counter */
 		int    TmpCount[LineNum];    /* Temporary Line Element Counter */
 		int    LineID; /* Line ID */
-		int    TmpID;  /* Temporary Line ID */
 		int    DrawMode; /* Draw Mode */
+		int    Nside;  /* for draw N-side Polygon */
 		bool   TmpFlag;/* Temporary Flag */
 		bool   PXFLAG; /* Pixel Mode Flag */
 		bool   ERFLAG; /* Eraser Flag */
@@ -80,22 +77,24 @@ class GRAPPA{
 		inline void SetPixelSize(int size);
 		inline int  CurrentDrawMode();
 		inline void SetDrawMode(int mode);
+		inline void SetDrawMode(int mode,int N_side);
 		inline void SetCoordinate(int x, int y);
 		inline void SetLineCircle(int x0, int y0, int x1, int y1);
 		inline void SetLineSquare(int x0, int y0, int x1, int y1);
-		inline void DrawCanvas();
-		inline void DrawFreeHand();
+		inline void SetLinePolygon(int x0, int y0, int x1, int y1);
 		inline void PixelMode();
 		inline void FillPixel();
 		inline void FillTmpPixel();
 		inline void UndoPixel();
+		inline void LineMove(int x0, int y0, int x1, int y1);
+		inline void LineRotate(double xc, double yc, double theta);
 		inline void PixelEraser();
 		inline bool PixelEraserFlag();
+		inline void DrawCanvas();
+		inline void DrawGlutLine();
 		inline void DrawPixel();
-		inline void Display();
+		inline void DrawDisplay();
 		inline void Status();
-		inline void SetLineID(int ID);
-		inline void BackLineID();
 		inline void CommandMode();
 		inline bool CommandFlag();
 		inline int  CommandStore(unsigned char key);
@@ -129,7 +128,7 @@ inline GRAPPA::GRAPPA():ColorBarArray(2000){
 		for(int j=0;j<Xpixel;++j){
 			for(int k=0;k<Ypixel;++k){
 				Pixel[i][j][k] = 1.0;
-				TmpPixel[i][j][k] = 0.0;
+				TmpPixel[i][j][k] = 1.0;
 			}
 		}
 	}
@@ -137,8 +136,7 @@ inline GRAPPA::GRAPPA():ColorBarArray(2000){
 	for(int i=0;i<ColorBarArray;++i)
 		ColorBarWidth[i] = 3.0;
 	LineID   = 0;
-	TmpID    = 0;
-	DrawMode = DFREEHAND;
+	DrawMode = MFREEHAND;
 	TmpFlag  = false;
 	PXFLAG   = false;
 	ERFLAG   = false;
@@ -188,28 +186,26 @@ inline void GRAPPA::Reset(){
 		for(int j=0;j<Xpixel;++j){
 			for(int k=0;k<Ypixel;++k){
 				Pixel[i][j][k] = 1.0;
-				TmpPixel[i][j][k] = 0.0;
+				TmpPixel[i][j][k] = 1.0;
 			}
 		}
 	}
 	LineID = 0;
-	TmpID  = 0;
 }
 
 
 inline void GRAPPA::NewFreeHand(){
-	if(DrawMode==DFREEHAND){
-		if(!TmpID){
-			LineID++;
-			if(LineNum<LineID) LineID = 0;
-			Counter[LineID] = 0;
-			if(ERFLAG) ++PixelEraserCounter;
-		}
+	if(DrawMode==MFREEHAND){
+		LineID++;
+		if(LineNum<LineID) LineID = 0;
+		Counter[LineID] = 0;
+		if(ERFLAG) ++PixelEraserCounter;
 	}
 }
 
 
 inline void GRAPPA::Undo(){
+	UndoPixel();
 	TmpCount[LineID] = Counter[LineID];
 	Counter[LineID] = 0;
 	if(0<LineID) --LineID;
@@ -220,6 +216,11 @@ inline void GRAPPA::Redo(){
 	if(LineID+1<LineNum){
 		if(Px[0][LineID+1] && Py[0][LineID+1]){
 			++LineID;
+			Counter[LineID] = 0;
+			for(int i=0;i<=TmpCount[LineID];++i){
+				FillPixel();
+				++Counter[LineID];
+			}
 			Counter[LineID] = TmpCount[LineID];
 		}
 	}
@@ -233,7 +234,7 @@ inline void GRAPPA::EraseLine(){
 
 
 inline void GRAPPA::DrawColorBar(){
-	if(DrawMode==DCOLORBARLINE||DrawMode==DCOLORBARCANVAS){
+	if(DrawMode==MCOLORBARLINE||DrawMode==MCOLORBARCANVAS){
 		double hmax = 1.0;
 		double hbin = hmax/ColorBarArray;
 		int i = 0;
@@ -308,7 +309,7 @@ inline void GRAPPA::SetDefaultLineWidth(double w){
 
 
 inline void GRAPPA::SetPixelSize(int size){
-	static int max = 30;
+	static int max = 10;
 	if(1<size && size<max) PixelSize = size;
 	else if(max<=size)     PixelSize = max;
 	else                   PixelSize = 1;
@@ -321,41 +322,49 @@ inline int GRAPPA::CurrentDrawMode(){
 
 
 inline void GRAPPA::SetDrawMode(int mode){
-	if(mode==DFREEHAND){ // Mouse State == GLUT_UP
-		if(DrawMode==DCOLORBARLINE||\
-			DrawMode==DCOLORBARCANVAS){
-			for(int i=0;i<ColorBarArray;++i)
-				ColorBarWidth[i] = 3.0;
-			printf("\n");
-		}
-		if(DrawMode==DCIRCLE||DrawMode==DSQUARE){
-			TmpFlag = false;
-		}
+	if(DrawMode==MCOLORBARLINE||\
+		DrawMode==MCOLORBARCANVAS){
+		for(int i=0;i<ColorBarArray;++i)
+			ColorBarWidth[i] = 3.0;
+		printf("\n");
 	}
+	if(TmpFlag) TmpFlag = false;
 	DrawMode = mode;
+}
+
+
+inline void GRAPPA::SetDrawMode(int mode, int N_side){
+	if(mode==MPOLYGON){
+		Nside = N_side;
+		if(N_side<3) Nside = 3;
+		if(CircleSample<N_side) Nside = CircleSample;
+		DrawMode = MPOLYGON;
+	}
 }
 
 
 inline void GRAPPA::SetCoordinate(int x, int y){
 	switch(DrawMode){
-		case DFREEHAND: /* Store Coordinate */
+		case MFREEHAND: /* Store Coordinate */
 			{
-				if(!TmpID){
-					if(Counter[LineID]<FreeMAX){
-						Px[Counter[LineID]][LineID] = x;
-						Py[Counter[LineID]][LineID] = y;
-						Counter[LineID]++;
-					}
-					else{
-						LineID++;
-						if(LineNum<LineID) LineID = 0;
-						if(ERFLAG) ++PixelEraserCounter;
-					}
-					FillPixel();
+				if(!TmpFlag){
+					FillTmpPixel();
+					TmpFlag = true;
 				}
+				if(Counter[LineID]<FreeMAX){
+					Px[Counter[LineID]][LineID] = x;
+					Py[Counter[LineID]][LineID] = y;
+					Counter[LineID]++;
+				}
+				else{
+					LineID++;
+					if(LineNum<=LineID) LineID = 0;
+					if(ERFLAG) ++PixelEraserCounter;
+				}
+				FillPixel();
 			}
 			break;
-		case DCOLORBARLINE: /* Set Line Color by ColorBar */
+		case MCOLORBARLINE: /* Set Line Color by ColorBar */
 			{
 				int ch = (int)((double)x/WX*ColorBarArray);
 				static double s = 15.0/WX*ColorBarArray;
@@ -370,7 +379,7 @@ inline void GRAPPA::SetCoordinate(int x, int y){
 				fflush(stdout);
 			}
 			break;
-		case DCOLORBARCANVAS: /* Set Canvas Color by ColorBar */
+		case MCOLORBARCANVAS: /* Set Canvas Color by ColorBar */
 			{
 				int ch = (int)((double)x/WX*ColorBarArray);
 				static double s = 15.0/WX*ColorBarArray;
@@ -384,7 +393,7 @@ inline void GRAPPA::SetCoordinate(int x, int y){
 				fflush(stdout);
 			}
 			break;
-		case DCIRCLE: /* Draw Circle */
+		case MCIRCLE: /* Draw Circle */
 			{
 				static int x0;
 				static int y0;
@@ -398,7 +407,7 @@ inline void GRAPPA::SetCoordinate(int x, int y){
 				SetLineCircle(x0,y0,x,y);
 			}
 			break;
-		case DSQUARE: /* Draw Square */
+		case MSQUARE: /* Draw Square */
 			{
 				static int x0;
 				static int y0;
@@ -410,6 +419,89 @@ inline void GRAPPA::SetCoordinate(int x, int y){
 					TmpFlag = true;
 				}
 				SetLineSquare(x0,y0,x,y);
+			}
+			break;
+		case MPOLYGON: /* Draw N-side Polygon */
+			{
+				static int x0;
+				static int y0;
+				if(!TmpFlag){
+					++LineID;
+					FillTmpPixel();
+					x0 = x;
+					y0 = y;
+					TmpFlag = true;
+				}
+				SetLinePolygon(x0,y0,x,y);
+			}
+			break;
+		case MSTRAIGHTLINE: /* Draw Straight Line */
+			{
+				if(!TmpFlag){
+					++LineID;
+					FillTmpPixel();
+					Px[0][LineID] = x;
+					Py[0][LineID] = y;
+					TmpFlag = true;
+				}
+				UndoPixel();
+				Px[1][LineID] = x;
+				Py[1][LineID] = y;
+				Counter[LineID] = 2;
+				FillPixel();
+			}
+			break;
+		case MRANDOM: // Draw Random
+			{
+				if(!TmpFlag){
+					++LineID;
+					TmpFlag = true;
+				}
+				Px[Counter[LineID]][LineID] = x+10*(2*randf()-1)*LineWidth[LineID];
+				Py[Counter[LineID]][LineID] = y+10*(2*randf()-1)*LineWidth[LineID];
+				++Counter[LineID];
+				if(FreeMAX<=Counter[LineID]) ++LineID;
+				FillPixel();
+			}
+			break;
+		case MLINEMOVE: // Line Move
+			if(0<LineID){
+				static int x0 = x;
+				static int y0 = y;
+				if(!TmpFlag){
+					x0 = x;
+					y0 = y;
+					TmpFlag = true;
+				}
+				UndoPixel();
+				LineMove(x0,y0,x,y);
+				x0 = x;
+				y0 = y;
+			}
+			break;
+		case MLINEROTATE: // Line Rotate
+			if(0<LineID){
+				static int x0 = x;
+				static int y0 = y;
+				static double xc,yc;
+				static double dot,vec0,vec1,theta; 
+				if(!TmpFlag){
+					xc = (Px[0][LineID]+Px[Counter[LineID]-1][LineID])/2.0;	
+					yc = (Py[0][LineID]+Py[Counter[LineID]-1][LineID])/2.0;	
+					TmpFlag = true;
+				}
+				UndoPixel();
+				dot   = (x0-xc)*(x-xc)+(y0-yc)*(y-yc);
+				vec0  = sqrt(pow(x0-xc,2)+pow(y0-yc,2));
+				vec1  = sqrt(pow(x-xc,2)+pow(y-yc,2));
+				double a = dot/(vec0*vec1);
+				if(a<-1) a = -1.0;
+				if(1<a)  a =  1.0;
+				theta = acos(a);
+				if(vec0==0 || vec1==0) theta = 0.0;
+				LineRotate(xc,yc,theta);
+				x0 = x;
+				y0 = y;
 			}
 			break;
 		default:
@@ -445,47 +537,17 @@ inline void GRAPPA::SetLineSquare(int x0, int y0, int x1, int y1){
 }
 
 
-inline void GRAPPA::DrawCanvas(){
-	if(!PXFLAG){
-		glColor3d(CanvasColor[0],CanvasColor[1],CanvasColor[2]);
-		glBegin(GL_QUADS);
-		glVertex2d(Cmargin/100,Cmargin/100);
-		glVertex2d((100-Cmargin)/100,Cmargin/100);
-		glVertex2d((100-Cmargin)/100,(100-Cmargin)/100);
-		glVertex2d(Cmargin/100,(100-Cmargin)/100);
-		glEnd();
-	}
-}
-
-
-inline void GRAPPA::DrawFreeHand(){
-	if(!PXFLAG){
-		for(int j=0;j<=LineID;++j){
-			glPointSize(LineWidth[j]);
-			glLineWidth(LineWidth[j]);
-			glColor3d(LineColor[0][j],LineColor[1][j],LineColor[2][j]);
-			if(Counter[j]==1){
-				glBegin(GL_POINTS);
-				glVertex2d((double)Px[0][j]/WX,1-(double)Py[0][j]/WY);
-				glEnd();
-			}
-			else{
-				glBegin(GL_LINE_STRIP);
-				for(int i=0;i<Counter[j];++i){
-					if((double)Px[i][j]<=(double)Cmargin/100*WX)
-						glVertex2d((double)Cmargin/100,1-(double)Py[i][j]/WY);
-					else if((double)(100-Cmargin)/100*WX<=(double)Px[i][j])
-						glVertex2d(1.0-(double)Cmargin/100,1-(double)Py[i][j]/WY);
-					else if((double)Py[i][j]<=(double)Cmargin/100*WY)
-						glVertex2d((double)Px[i][j]/WX,1.0-(double)Cmargin/100);
-					else if((double)(100-Cmargin)/100*WY<=(double)Py[i][j])
-						glVertex2d((double)Px[i][j]/WX,(double)Cmargin/100);
-					else
-						glVertex2d((double)Px[i][j]/WX,1-(double)Py[i][j]/WY);
-				}
-				glEnd();
-			}
-		}
+inline void GRAPPA::SetLinePolygon(int x0, int y0, int x1, int y1){
+	UndoPixel();
+	double x = (x1+x0)/2;
+	double y = (y1+y0)/2;
+	double r = sqrt(pow(x1-x,2)+pow(y1-y,2));
+	Counter[LineID] = 0;
+	for(int i=0;i<=Nside;++i){
+		Px[Counter[LineID]][LineID] = x+r*sin((double)i/Nside*2*PI);
+		Py[Counter[LineID]][LineID] = y-r*cos((double)i/Nside*2*PI);
+		++Counter[LineID];
+		FillPixel();
 	}
 }
 
@@ -558,9 +620,36 @@ inline void GRAPPA::UndoPixel(){
 	for(int i=0;i<3;++i){
 		for(int j=0;j<Xpixel;++j){
 			for(int k=0;k<Ypixel;++k){
-				Pixel[i][j][k] = TmpPixel[i][j][k];
+				if(Pixel[i][j][k]!=TmpPixel[i][j][k])
+					Pixel[i][j][k] = TmpPixel[i][j][k];
 			}
 		}
+	}
+}
+
+
+inline void GRAPPA::LineMove(int x0, int y0, int x1, int y1){
+	int max = Counter[LineID];
+	Counter[LineID] = 0;
+	for(int i=0;i<max;++i){
+		Px[i][LineID] += x1-x0;
+		Py[i][LineID] += y1-y0;
+		++Counter[LineID];
+		FillPixel();
+	}
+}
+
+
+inline void GRAPPA::LineRotate(double xc, double yc, double theta){
+	int max = Counter[LineID];
+	Counter[LineID] = 0;
+	for(int i=0;i<max;++i){
+		double x = Px[i][LineID];
+		double y = Py[i][LineID];
+		Px[i][LineID] = xc+(x-xc)*cos(theta)-(y-yc)*sin(theta);
+		Py[i][LineID] = yc+(x-xc)*sin(theta)+(y-yc)*cos(theta);
+		++Counter[LineID];
+		FillPixel();
 	}
 }
 
@@ -580,7 +669,11 @@ inline void GRAPPA::PixelEraser(){
 		else{ // Eraser OFF
 			ERFLAG = false;
 			if(PixelEraserCounter){
-				for(int i=0;i<PixelEraserCounter;++i) Undo();
+				for(int i=0;i<PixelEraserCounter;++i){
+					TmpCount[LineID] = Counter[LineID];
+					Counter[LineID] = 0;
+					if(0<LineID) --LineID;
+				}
 				PixelEraserCounter = 0;
 			}
 			PixelSize = TmpPixelSize;
@@ -592,6 +685,51 @@ inline void GRAPPA::PixelEraser(){
 
 inline bool GRAPPA::PixelEraserFlag(){
 	return ERFLAG;
+}
+
+
+inline void GRAPPA::DrawCanvas(){
+	if(!PXFLAG){
+		glColor3d(CanvasColor[0],CanvasColor[1],CanvasColor[2]);
+		glBegin(GL_QUADS);
+		glVertex2d(Cmargin/100,Cmargin/100);
+		glVertex2d((100-Cmargin)/100,Cmargin/100);
+		glVertex2d((100-Cmargin)/100,(100-Cmargin)/100);
+		glVertex2d(Cmargin/100,(100-Cmargin)/100);
+		glEnd();
+	}
+}
+
+
+inline void GRAPPA::DrawGlutLine(){
+	if(!PXFLAG){
+		for(int j=0;j<=LineID;++j){
+			glPointSize(LineWidth[j]);
+			glLineWidth(LineWidth[j]);
+			glColor3d(LineColor[0][j],LineColor[1][j],LineColor[2][j]);
+			if(Counter[j]==1){
+				glBegin(GL_POINTS);
+				glVertex2d((double)Px[0][j]/WX,1-(double)Py[0][j]/WY);
+				glEnd();
+			}
+			else{
+				glBegin(GL_LINE_STRIP);
+				for(int i=0;i<Counter[j];++i){
+					if((double)Px[i][j]<=(double)Cmargin/100*WX)
+						glVertex2d((double)Cmargin/100,1-(double)Py[i][j]/WY);
+					else if((double)(100-Cmargin)/100*WX<=(double)Px[i][j])
+						glVertex2d(1.0-(double)Cmargin/100,1-(double)Py[i][j]/WY);
+					else if((double)Py[i][j]<=(double)Cmargin/100*WY)
+						glVertex2d((double)Px[i][j]/WX,1.0-(double)Cmargin/100);
+					else if((double)(100-Cmargin)/100*WY<=(double)Py[i][j])
+						glVertex2d((double)Px[i][j]/WX,(double)Cmargin/100);
+					else
+						glVertex2d((double)Px[i][j]/WX,1-(double)Py[i][j]/WY);
+				}
+				glEnd();
+			}
+		}
+	}
 }
 
 
@@ -612,7 +750,7 @@ inline void GRAPPA::DrawPixel(){
 }
 
 
-inline void GRAPPA::Display(){
+inline void GRAPPA::DrawDisplay(){
 	if(CanvasColor[0]==CanvasColor[1]&&CanvasColor[1]==CanvasColor[2])
 		glColor3d(0.5-CanvasColor[0],0.5-CanvasColor[1],1.0-CanvasColor[2]);
 	else
@@ -651,22 +789,6 @@ inline void GRAPPA::Display(){
 		}
 		++count;
 		glDrawString(s,(Cmargin+1)/100,(Cmargin+2)/100);
-	}
-}
-
-
-inline void GRAPPA::SetLineID(int ID){
-	if(!TmpID && 0<ID && ID<LineID){
-		TmpID  = LineID;
-		LineID = ID;
-	}
-}
-
-
-inline void GRAPPA::BackLineID(){
-	if(TmpID){
-		LineID = TmpID;
-		TmpID  = 0;
 	}
 }
 
