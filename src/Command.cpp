@@ -42,11 +42,17 @@ void Commands(){
 	else if(Drawing.RunCommand("backid"))
 		Drawing.BackLineID();
 		
-	else if(Drawing.RunCommand("cco",&Arg1,&Arg2,&Arg3))
-		Drawing.SetCanvasColor(Arg1,Arg2,Arg3);
+	else if(Drawing.RunCommand("co"))
+		Drawing.SetDrawMode(DCOLORBARLINE);
 
 	else if(Drawing.RunCommand("co",&Arg1,&Arg2,&Arg3))
 		Drawing.SetLineColor(Arg1,Arg2,Arg3);
+
+	else if(Drawing.RunCommand("cco"))
+		Drawing.SetDrawMode(DCOLORBARCANVAS);
+
+	else if(Drawing.RunCommand("cco",&Arg1,&Arg2,&Arg3))
+		Drawing.SetCanvasColor(Arg1,Arg2,Arg3);
 
 	else if(Drawing.RunCommand("dco",&Arg1,&Arg2,&Arg3))
 		Drawing.SetDefaultLineColor(Arg1,Arg2,Arg3);
@@ -63,9 +69,6 @@ void Commands(){
 	else if(Drawing.RunCommand("coy"))
 		Drawing.SetLineColor(1.0,1.0,0.0);
 
-	else if(Drawing.RunCommand("cb"))
-		Drawing.ColorBarMode();
-
 	else if(Drawing.RunCommand("lw",&Arg1))
 		Drawing.SetLineWidth(Arg1);
 
@@ -80,6 +83,12 @@ void Commands(){
 
 	else if(Drawing.RunCommand("eraser"))
 		Drawing.PixelEraser();
+
+	else if(Drawing.RunCommand("circle"))
+		Drawing.SetDrawMode(DCIRCLE);
+
+	else if(Drawing.RunCommand("square"))
+		Drawing.SetDrawMode(DSQUARE);
 
 }
 
