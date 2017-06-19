@@ -23,8 +23,8 @@ void MouseClick(int button, int state, int x, int y){
 					MFLAG = false;
 					if(Drawing.PixelEraserFlag())
 						Drawing.PixelEraser();
-					if(Drawing.ColorBarFlag())
-						Drawing.ColorBarMode();
+					if(Drawing.CurrentDrawMode()!=DFREEHAND)
+						Drawing.SetDrawMode(DFREEHAND);
 				}
 			}
 			else{
@@ -36,8 +36,8 @@ void MouseClick(int button, int state, int x, int y){
 					MFLAG = false;
 					if(Drawing.PixelEraserFlag())
 						Drawing.PixelEraser();
-					if(Drawing.ColorBarFlag())
-						Drawing.ColorBarMode();
+					if(Drawing.CurrentDrawMode()!=DFREEHAND)
+						Drawing.SetDrawMode(DFREEHAND);
 				}
 			}
 			break;
