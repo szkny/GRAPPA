@@ -27,9 +27,9 @@ all: $(LIBRARY) $(NAME)
 
 # make archives
 $(LIBRARY): $(OBJECTS)
-	ar ru $(LIB_DIR)/$(LIBRARY) $(OBJECTS)
-	ranlib $(LIB_DIR)/$(LIBRARY)
-	$(RM) $(OBJECTS) 
+	@ar ru $(LIB_DIR)/$(LIBRARY) $(OBJECTS)
+	@ranlib $(LIB_DIR)/$(LIBRARY)
+	@$(RM) $(OBJECTS) 
 
 # make execute file
 $(NAME): $(LIB_DIR)/$(LIBRARY)
