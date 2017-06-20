@@ -24,8 +24,10 @@
 #define MPOLYGON        5
 #define MSTRAIGHTLINE   6
 #define MRANDOM         7
-#define MLINEMOVE       8
-#define MLINEROTATE     9
+#define MKALEIDO        8
+#define MLINEMOVE       9
+#define MLINECOPY       10
+#define MLINEROTATE     11
 
 /* Circle Samples */
 #define CircleSample 50
@@ -79,15 +81,19 @@ class GRAPPA{
 		inline void SetDrawMode(int mode);
 		inline void SetDrawMode(int mode,int N_side);
 		inline void SetCoordinate(int x, int y);
-		inline void SetLineCircle(int x0, int y0, int x1, int y1);
-		inline void SetLineSquare(int x0, int y0, int x1, int y1);
-		inline void SetLinePolygon(int x0, int y0, int x1, int y1);
+		inline void SetLineCircle(int x, int y);
+		inline void SetLineSquare(int x, int y);
+		inline void SetLinePolygon(int x, int y);
+		inline void SetStraightLine(int x, int y);
+		inline void SetRandom(int x, int y);
+		inline void SetKaleido(int x, int y);
+		inline void LineMove(int x, int y);
+		inline void LineCopy(int x, int y);
+		inline void LineRotate(int x, int y);
 		inline void PixelMode();
 		inline void FillPixel();
 		inline void FillTmpPixel();
 		inline void UndoPixel();
-		inline void LineMove(int x0, int y0, int x1, int y1);
-		inline void LineRotate(double xc, double yc, double theta);
 		inline void PixelEraser();
 		inline bool PixelEraserFlag();
 		inline void DrawCanvas();
@@ -110,7 +116,7 @@ class GRAPPA{
 };
 
 
-inline GRAPPA::GRAPPA():ColorBarArray(2000){
+inline GRAPPA::GRAPPA():ColorBarArray(500){
 	for(int j=0;j<LineNum;++j){
 		for(int i=0;i<FreeMAX;++i){
 			Px[i][j] = 0;
@@ -205,7 +211,7 @@ inline void GRAPPA::NewFreeHand(){
 
 
 inline void GRAPPA::Undo(){
-	UndoPixel();
+	//UndoPixel();
 	TmpCount[LineID] = Counter[LineID];
 	Counter[LineID] = 0;
 	if(0<LineID) --LineID;
@@ -218,7 +224,7 @@ inline void GRAPPA::Redo(){
 			++LineID;
 			Counter[LineID] = 0;
 			for(int i=0;i<=TmpCount[LineID];++i){
-				FillPixel();
+				//FillPixel();
 				++Counter[LineID];
 			}
 			Counter[LineID] = TmpCount[LineID];
@@ -275,6 +281,7 @@ inline void GRAPPA::SetCanvasColor(double R, double G, double B){
 		SetDefaultLineColor(0.5-R,0.5-G,1.0-B);
 	else
 		SetDefaultLineColor(1.0-R,1.0-G,1.0-B);
+	FillTmpPixel();
 }
 
 
@@ -394,115 +401,31 @@ inline void GRAPPA::SetCoordinate(int x, int y){
 			}
 			break;
 		case MCIRCLE: /* Draw Circle */
-			{
-				static int x0;
-				static int y0;
-				if(!TmpFlag){
-					++LineID;
-					FillTmpPixel();
-					x0 = x;
-					y0 = y;
-					TmpFlag = true;
-				}
-				SetLineCircle(x0,y0,x,y);
-			}
+			SetLineCircle(x,y);
 			break;
 		case MSQUARE: /* Draw Square */
-			{
-				static int x0;
-				static int y0;
-				if(!TmpFlag){
-					++LineID;
-					FillTmpPixel();
-					x0 = x;
-					y0 = y;
-					TmpFlag = true;
-				}
-				SetLineSquare(x0,y0,x,y);
-			}
+			SetLineSquare(x,y);
 			break;
 		case MPOLYGON: /* Draw N-side Polygon */
-			{
-				static int x0;
-				static int y0;
-				if(!TmpFlag){
-					++LineID;
-					FillTmpPixel();
-					x0 = x;
-					y0 = y;
-					TmpFlag = true;
-				}
-				SetLinePolygon(x0,y0,x,y);
-			}
+			SetLinePolygon(x,y);
 			break;
 		case MSTRAIGHTLINE: /* Draw Straight Line */
-			{
-				if(!TmpFlag){
-					++LineID;
-					FillTmpPixel();
-					Px[0][LineID] = x;
-					Py[0][LineID] = y;
-					TmpFlag = true;
-				}
-				UndoPixel();
-				Px[1][LineID] = x;
-				Py[1][LineID] = y;
-				Counter[LineID] = 2;
-				FillPixel();
-			}
+			SetStraightLine(x,y);
 			break;
-		case MRANDOM: // Draw Random
-			{
-				if(!TmpFlag){
-					++LineID;
-					TmpFlag = true;
-				}
-				Px[Counter[LineID]][LineID] = x+10*(2*randf()-1)*LineWidth[LineID];
-				Py[Counter[LineID]][LineID] = y+10*(2*randf()-1)*LineWidth[LineID];
-				++Counter[LineID];
-				if(FreeMAX<=Counter[LineID]) ++LineID;
-				FillPixel();
-			}
+		case MRANDOM: /* Draw Random */
+			SetRandom(x,y);
 			break;
-		case MLINEMOVE: // Line Move
-			if(0<LineID){
-				static int x0 = x;
-				static int y0 = y;
-				if(!TmpFlag){
-					x0 = x;
-					y0 = y;
-					TmpFlag = true;
-				}
-				UndoPixel();
-				LineMove(x0,y0,x,y);
-				x0 = x;
-				y0 = y;
-			}
+		case MKALEIDO: /* Draw Kaleido */
+			SetKaleido(x,y);
 			break;
-		case MLINEROTATE: // Line Rotate
-			if(0<LineID){
-				static int x0 = x;
-				static int y0 = y;
-				static double xc,yc;
-				static double dot,vec0,vec1,theta; 
-				if(!TmpFlag){
-					xc = (Px[0][LineID]+Px[Counter[LineID]-1][LineID])/2.0;	
-					yc = (Py[0][LineID]+Py[Counter[LineID]-1][LineID])/2.0;	
-					TmpFlag = true;
-				}
-				UndoPixel();
-				dot   = (x0-xc)*(x-xc)+(y0-yc)*(y-yc);
-				vec0  = sqrt(pow(x0-xc,2)+pow(y0-yc,2));
-				vec1  = sqrt(pow(x-xc,2)+pow(y-yc,2));
-				double a = dot/(vec0*vec1);
-				if(a<-1) a = -1.0;
-				if(1<a)  a =  1.0;
-				theta = acos(a);
-				if(vec0==0 || vec1==0) theta = 0.0;
-				LineRotate(xc,yc,theta);
-				x0 = x;
-				y0 = y;
-			}
+		case MLINEMOVE: /* Line Move */
+			LineMove(x,y);
+			break;
+		case MLINECOPY: /* Line Copy */
+			LineCopy(x,y);
+			break;
+		case MLINEROTATE: /* Line Rotate */
+			LineRotate(x,y);
 			break;
 		default:
 			break;
@@ -510,44 +433,229 @@ inline void GRAPPA::SetCoordinate(int x, int y){
 }
 
 
-inline void GRAPPA::SetLineCircle(int x0, int y0, int x1, int y1){
+inline void GRAPPA::SetLineCircle(int x, int y){
+	static int x0;
+	static int y0;
+	if(!TmpFlag){
+		++LineID;
+		FillTmpPixel();
+		x0 = x;
+		y0 = y;
+		TmpFlag = true;
+	}
 	UndoPixel();
-	double x = (x1+x0)/2;
-	double y = (y1+y0)/2;
-	double r = sqrt(pow(x1-x,2)+pow(y1-y,2));
+	double xc = (x+x0)/2;
+	double yc = (y+y0)/2;
+	double r  = sqrt(pow(x-xc,2)+pow(y-yc,2));
 	Counter[LineID] = 0;
 	for(int i=0;i<=CircleSample;++i){
-		Px[Counter[LineID]][LineID] = x+r*cos((double)i/CircleSample*2*PI);
-		Py[Counter[LineID]][LineID] = y+r*sin((double)i/CircleSample*2*PI);
+		Px[Counter[LineID]][LineID] = xc+r*cos((double)i/CircleSample*2*PI);
+		Py[Counter[LineID]][LineID] = yc+r*sin((double)i/CircleSample*2*PI);
 		++Counter[LineID];
 		FillPixel();
 	}
 }
 
 
-inline void GRAPPA::SetLineSquare(int x0, int y0, int x1, int y1){
+inline void GRAPPA::SetLineSquare(int x, int y){
+	static int x0;
+	static int y0;
+	if(!TmpFlag){
+		++LineID;
+		FillTmpPixel();
+		x0 = x;
+		y0 = y;
+		TmpFlag = true;
+	}
 	UndoPixel();
 	Counter[LineID] = 0;
 	for(int i=0;i<=4;++i){
-		Px[Counter[LineID]][LineID] = (((i+2)%4)/2)*x0+((i%4)/2)*x1;
-		Py[Counter[LineID]][LineID] = (((i+3)%4)/2)*y0+(((i+1)%4)/2)*y1;
+		Px[Counter[LineID]][LineID] = (((i+2)%4)/2)*x0+((i%4)/2)*x;
+		Py[Counter[LineID]][LineID] = (((i+3)%4)/2)*y0+(((i+1)%4)/2)*y;
 		++Counter[LineID];
 		FillPixel();
 	}
 }
 
 
-inline void GRAPPA::SetLinePolygon(int x0, int y0, int x1, int y1){
+inline void GRAPPA::SetLinePolygon(int x, int y){
+	static int x0;
+	static int y0;
+	if(!TmpFlag){
+		++LineID;
+		FillTmpPixel();
+		x0 = x;
+		y0 = y;
+		TmpFlag = true;
+	}
 	UndoPixel();
-	double x = (x1+x0)/2;
-	double y = (y1+y0)/2;
-	double r = sqrt(pow(x1-x,2)+pow(y1-y,2));
+	double xc = (x+x0)/2;
+	double yc = (y+y0)/2;
+	double r  = sqrt(pow(x-xc,2)+pow(y-yc,2));
 	Counter[LineID] = 0;
 	for(int i=0;i<=Nside;++i){
-		Px[Counter[LineID]][LineID] = x+r*sin((double)i/Nside*2*PI);
-		Py[Counter[LineID]][LineID] = y-r*cos((double)i/Nside*2*PI);
+		Px[Counter[LineID]][LineID] = xc+r*sin((double)i/Nside*2*PI);
+		Py[Counter[LineID]][LineID] = yc-r*cos((double)i/Nside*2*PI);
 		++Counter[LineID];
 		FillPixel();
+	}
+}
+
+
+inline void GRAPPA::SetStraightLine(int x, int y){
+	if(!TmpFlag){
+		++LineID;
+		FillTmpPixel();
+		Px[0][LineID] = x;
+		Py[0][LineID] = y;
+		TmpFlag = true;
+	}
+	UndoPixel();
+	Px[1][LineID] = x;
+	Py[1][LineID] = y;
+	Counter[LineID] = 2;
+	FillPixel();
+}
+
+
+inline void GRAPPA::SetRandom(int x, int y){
+	if(!TmpFlag){
+		++LineID;
+		TmpFlag = true;
+	}
+	Px[Counter[LineID]][LineID] = x+10*(2*randf()-1)*LineWidth[LineID];
+	Py[Counter[LineID]][LineID] = y+10*(2*randf()-1)*LineWidth[LineID];
+	++Counter[LineID];
+	if(FreeMAX<=Counter[LineID]) ++LineID;
+	FillPixel();
+}
+
+
+inline void GRAPPA::SetKaleido(int x, int y){
+	static int x0;
+	static int y0;
+	if(!TmpFlag){
+		hue2rgb C(LineID,20);
+		SetDefaultLineColor(C.R(),C.G(),C.B());
+		++LineID;
+		FillTmpPixel();
+		x0 = x;
+		y0 = y;
+		TmpFlag = true;
+	}
+	double xc = (x+x0)/2;
+	double yc = (y+y0)/2;
+	double r  = sqrt(pow(x-xc,2)+pow(y-yc,2));
+	double theta,a;
+	if(r==0) theta = 0.0;
+	else{
+		a = (x0-xc)/r;
+		if(a<-1) a =-1.0;
+		if(1<a)  a = 1.0;
+		theta = acos(a);
+	}
+	for(int i=0;i<=CircleSample;++i){
+		Px[Counter[LineID]][LineID] = xc+r*cos((double)i/CircleSample*2*PI+theta);
+		Py[Counter[LineID]][LineID] = yc+r*sin((double)i/CircleSample*2*PI+theta);
+		++Counter[LineID];
+		if(FreeMAX-1<Counter[LineID]){
+			hue2rgb C(LineID,20);
+			SetDefaultLineColor(C.R(),C.G(),C.B());
+			++LineID;
+		}
+		FillPixel();
+	}
+}
+
+
+inline void GRAPPA::LineMove(int x, int y){
+	if(0<Counter[LineID]){
+		static int x0 = x;
+		static int y0 = y;
+		if(!TmpFlag){
+			x0 = x;
+			y0 = y;
+			TmpFlag = true;
+		}
+		UndoPixel();
+		int max = Counter[LineID];
+		Counter[LineID] = 0;
+		for(int i=0;i<max;++i){
+			Px[i][LineID] += x-x0;
+			Py[i][LineID] += y-y0;
+			++Counter[LineID];
+			FillPixel();
+		}
+		x0 = x;
+		y0 = y;
+	}
+}
+
+
+inline void GRAPPA::LineCopy(int x, int y){
+	if(0<Counter[LineID]){
+		static int x0 = x;
+		static int y0 = y;
+		if(!TmpFlag){
+			FillTmpPixel();
+			x0 = x;
+			y0 = y;
+			++LineID;
+			Counter[LineID] = 0;
+			for(int i=0;i<Counter[LineID-1];++i){
+				Px[i][LineID] = Px[i][LineID-1];
+				Py[i][LineID] = Py[i][LineID-1];
+				++Counter[LineID];
+			}
+			TmpFlag = true;
+		}
+		UndoPixel();
+		int max = Counter[LineID];
+		Counter[LineID] = 0;
+		for(int i=0;i<max;++i){
+			Px[i][LineID] += x-x0;
+			Py[i][LineID] += y-y0;
+			++Counter[LineID];
+			FillPixel();
+		}
+		x0 = x;
+		y0 = y;
+	}
+}
+
+
+inline void GRAPPA::LineRotate(int x, int y){
+	if(0<LineID){
+		static int x0 = x;
+		static int y0 = y;
+		static double xc,yc;
+		static double dot,vec0,vec1,theta; 
+		if(!TmpFlag){
+			xc = (Px[0][LineID]+Px[Counter[LineID]-1][LineID])/2.0;	
+			yc = (Py[0][LineID]+Py[Counter[LineID]-1][LineID])/2.0;	
+			TmpFlag = true;
+		}
+		UndoPixel();
+		dot   = (x0-xc)*(x-xc)+(y0-yc)*(y-yc);
+		vec0  = sqrt(pow(x0-xc,2)+pow(y0-yc,2));
+		vec1  = sqrt(pow(x-xc,2)+pow(y-yc,2));
+		double a = dot/(vec0*vec1);
+		if(a<-1) a = -1.0;
+		if(1<a)  a =  1.0;
+		theta = acos(a);
+		if(vec0==0 || vec1==0) theta = 0.0;
+		int max = Counter[LineID];
+		Counter[LineID] = 0;
+		for(int i=0;i<max;++i){
+			double X = Px[i][LineID];
+			double Y = Py[i][LineID];
+			Px[i][LineID] = xc+(X-xc)*cos(theta)-(Y-yc)*sin(theta);
+			Py[i][LineID] = yc+(X-xc)*sin(theta)+(Y-yc)*cos(theta);
+			++Counter[LineID];
+			FillPixel();
+		}
+		x0 = x;
+		y0 = y;
 	}
 }
 
@@ -624,32 +732,6 @@ inline void GRAPPA::UndoPixel(){
 					Pixel[i][j][k] = TmpPixel[i][j][k];
 			}
 		}
-	}
-}
-
-
-inline void GRAPPA::LineMove(int x0, int y0, int x1, int y1){
-	int max = Counter[LineID];
-	Counter[LineID] = 0;
-	for(int i=0;i<max;++i){
-		Px[i][LineID] += x1-x0;
-		Py[i][LineID] += y1-y0;
-		++Counter[LineID];
-		FillPixel();
-	}
-}
-
-
-inline void GRAPPA::LineRotate(double xc, double yc, double theta){
-	int max = Counter[LineID];
-	Counter[LineID] = 0;
-	for(int i=0;i<max;++i){
-		double x = Px[i][LineID];
-		double y = Py[i][LineID];
-		Px[i][LineID] = xc+(x-xc)*cos(theta)-(y-yc)*sin(theta);
-		Py[i][LineID] = yc+(x-xc)*sin(theta)+(y-yc)*cos(theta);
-		++Counter[LineID];
-		FillPixel();
 	}
 }
 
