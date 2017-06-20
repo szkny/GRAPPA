@@ -1,7 +1,7 @@
 # GRAPPA
 vim-like paint application for OS X (using GLUT)
 
-  __prepare
+Execute the following command for using GLUT.
 ``` sh
 $ sudo mkdir /usr/local/include
 $ sudo mkdir /usr/local/include/GL
