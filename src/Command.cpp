@@ -39,6 +39,9 @@ void Commands(){
 	else if(Drawing.RunCommand("mv"))
 		Drawing.SetDrawMode(MLINEMOVE);
 		
+	else if(Drawing.RunCommand("cp"))
+		Drawing.SetDrawMode(MLINECOPY);
+		
 	else if(Drawing.RunCommand("rotate"))
 		Drawing.SetDrawMode(MLINEROTATE);
 		
@@ -98,6 +101,9 @@ void Commands(){
 
 	else if(Drawing.RunCommand("rand"))
 		Drawing.SetDrawMode(MRANDOM);
+
+	else if(Drawing.RunCommand("kaleido"))
+		Drawing.SetDrawMode(MKALEIDO);
 
 }
 
