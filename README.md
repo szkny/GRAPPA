@@ -2,7 +2,7 @@
 vim-like paint application for OS X by GLUT(The OpenGL Utility Toolkit)
 
 
-1. Execute the following command for using GLUT.
+1. Execute the following command for using GLUT
 ``` sh
 $ sudo mkdir /usr/local/include
 $ sudo mkdir /usr/local/include/GL
