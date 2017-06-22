@@ -923,14 +923,15 @@ inline int GRAPPA::CommandStore(unsigned char key){
 				CMFLAG = false;
 			}
 		}
-		else{
-			if(CmdCursor){
+		else{//character input
+			if(CmdCursor&&CmdCursor<=size&&size<32){
 				char tmp[128];
+				memset(tmp,'\0',sizeof(tmp));
 				for(int i=0;i<CmdCursor;++i)
 					tmp[i] = CommandString[CmdID][i+size-CmdCursor];
-				memset(CommandString[CmdID]+size-CmdCursor,key,1);
-				memset(CommandString[CmdID]+size-CmdCursor+1,'\0',1);
-				if(size<32) sprintf(CommandString[CmdID],"%s%s",CommandString[CmdID],tmp);
+				CommandString[CmdID][size-CmdCursor]   = key;
+				CommandString[CmdID][size-CmdCursor+1] = '\0';
+				strcat(CommandString[CmdID],tmp);
 			}
 			else{
 				char s[4];
@@ -982,7 +983,7 @@ inline void GRAPPA::CommandCursor(int key){
 			case GLUT_KEY_LEFT://left-arrow key
 				++CmdCursor;
 				if((int)strlen(CommandString[CmdID])<CmdCursor)
-					CmdCursor = strlen(CommandString[CmdID])-1;
+					CmdCursor = strlen(CommandString[CmdID]);
 				break;
 			default:
 				break;
