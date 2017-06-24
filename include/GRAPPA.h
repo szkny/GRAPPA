@@ -3,7 +3,7 @@
 
 /*****************************/
 
-#include<GL/glut.h>
+#include<glut.h>
 #include<MyGLUT.h>
 #include<Colors.h>
 

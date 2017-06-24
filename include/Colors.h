@@ -47,7 +47,7 @@ inline hue2rgb::hue2rgb(double h, double hmax){
 		g = 0.0;
 		b = 1.0;
 	}
-	else if(300<=hue&&hue<360){
+	else if(300<=hue&&hue<=360){
 		r = 1.0;
 		g = 0.0;
 		b = (360-hue)/60;

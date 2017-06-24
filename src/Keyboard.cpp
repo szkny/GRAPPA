@@ -2,7 +2,7 @@
 *	Keyboard Shortcuts Configurations 
 */
 
-#include<GL/glut.h>
+#include<glut.h>
 #include<GRAPPA.h>
 
 extern bool MFLAG; //defined in Mouse.cpp

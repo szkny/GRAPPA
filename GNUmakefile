@@ -1,17 +1,17 @@
 # GNUmakefile
-#		(c) S.Suzuki 2017.1.16 ————— patch 2017.6.1
+#		(c) S.Suzuki 2017.1.16 ————— patch 2017.6.24
 
 NAME     = GRAPPA
 
 SUFFIX   = .cpp
 
 SRC_DIR  = ./src
-INC_DIR  = ./include
+INC_DIR  = -I./include -I/System/Library/Frameworks/GLUT.framework/Headers
 LIB_DIR  = ./lib
 EXE_DIR  = ./bin
 
 COMPILER = g++
-CFLAGS   = -Wall -O2
+CFLAGS   = -w -O2
 FRAME    = -framework GLUT -framework OpenGL 
 
 SOURCES  = $(wildcard $(SRC_DIR)/*$(SUFFIX))
@@ -33,12 +33,12 @@ $(LIBRARY): $(OBJECTS)
 
 # make execute file
 $(NAME): $(LIB_DIR)/$(LIBRARY)
-	$(COMPILER) -I$(INC_DIR) $(CFLAGS) $(FRAME) -o $(EXE_DIR)/$@ $^
+	$(COMPILER) $(INC_DIR) $(CFLAGS) $(FRAME) -o $(EXE_DIR)/$@ $^
 
 # macro for make object file
 define MACRO
 $(1).o:
-	$(COMPILER) -I$(INC_DIR) $(CFLAGS) $(FRAME) -c $(SRC_DIR)/$(1)$(SUFFIX)
+	$(COMPILER) $(INC_DIR) $(CFLAGS) $(FRAME) -c $(SRC_DIR)/$(1)$(SUFFIX)
 endef
 
 $(foreach var,$(TARGETS),$(eval $(call MACRO,$(var))))
