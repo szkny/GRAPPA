@@ -2,7 +2,7 @@
 vim-like paint application for OS X by GLUT(The OpenGL Utility Toolkit)
 
 Extract the zip file and change directory to 'GRAPPA-master', then make 'GRAPPA'
-``` sh
+```
 $ cd ~/Downloads/GRAPPA-master
 $ make
 $ ./bin/GRAPPA
