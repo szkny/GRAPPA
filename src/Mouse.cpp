@@ -2,7 +2,7 @@
 *	Mouse Configurations 
 */
 
-#include<GL/glut.h>
+#include<glut.h>
 #include<GRAPPA.h>
 
 bool MFLAG;

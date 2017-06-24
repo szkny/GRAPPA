@@ -1,7 +1,7 @@
 /*
 *	PopupMenu Configurations
 */
-#include<GL/glut.h>
+#include<glut.h>
 #include<MyGLUT.h>
 
 
