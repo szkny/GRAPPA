@@ -11,7 +11,14 @@
 #include<time.h>
 #include<string.h>
 
+#ifdef __APPLE__
 #include<GLUT/glut.h>
+#endif
+
+#ifdef linux
+#include<GL/glut.h>
+#endif
+
 #include<GRAPPA.h>
 
 
