@@ -2,7 +2,7 @@
 *	GRAPPA Commands Configurations 
 */
 
-#include<glut.h>
+#include<GLUT/glut.h>
 #include<GRAPPA.h>
 
 extern bool MFLAG; //defined in Mouse.cpp

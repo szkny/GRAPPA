@@ -11,7 +11,7 @@
 #include<time.h>
 #include<string.h>
 
-#include<glut.h>
+#include<GLUT/glut.h>
 #include<GRAPPA.h>
 
 

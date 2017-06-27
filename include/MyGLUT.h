@@ -7,7 +7,7 @@
 #include<stdlib.h>
 #include<math.h>
 #include<string.h>
-#include<glut.h>
+#include<GLUT/glut.h>
 
 #include"define.h"
 
