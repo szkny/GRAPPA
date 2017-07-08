@@ -11,10 +11,12 @@
 #endif
 
 #include<GRAPPA.h>
+#include<Command.h>
 
 extern bool MFLAG; //defined in Mouse.cpp
 extern bool M_Nodrag; //defined in Mouce.cpp
 extern GRAPPA Drawing;
+extern Command Cmd;
 
 void MouseDrawMode(void);
 void KeyboardMode(void);
@@ -42,7 +44,7 @@ void KeyboardShortcut(unsigned char key, int x, int y){
 			MNDrag();
 			break;
 		case ':':
-			Drawing.CommandMode();
+			Cmd.CommandMode();
 			KeyboardMode();
 			break;
 		default:
@@ -52,7 +54,7 @@ void KeyboardShortcut(unsigned char key, int x, int y){
 
 
 void KeyboardMode(void){
-	if(Drawing.CommandFlag()) glutKeyboardFunc(InputKey);
+	if(Cmd.CommandFlag()) glutKeyboardFunc(InputKey);
 	else glutKeyboardFunc(KeyboardShortcut);
 }
 
