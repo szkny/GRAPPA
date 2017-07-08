@@ -20,7 +20,7 @@
 #endif
 
 #include<GRAPPA.h>
-
+#include<Command.h>
 
 /* Function Prototype Declaration */
 void WindowCanvas(void);
@@ -38,6 +38,7 @@ void keyboard_sp(int key, int x, int y);
 
 /* Declaration of new GRAPPA class */
 GRAPPA Drawing;
+Command Cmd;
 
 /* main function */
 int main(int argc, char *argv[]){
@@ -45,7 +46,6 @@ int main(int argc, char *argv[]){
 	WindowCanvas();
 	PopUpMenu();
 	Controler();
-	
 	glutMainLoop();
 	return 0;
 }
@@ -73,13 +73,12 @@ void Controler(void){
 
 void Display(void){
 	glClear(GL_COLOR_BUFFER_BIT);
-
 	Drawing.DrawPixel();
 	Drawing.DrawCanvas();
 	Drawing.DrawGlutLine();
 	Drawing.DrawColorBar();
 	Drawing.DrawDisplay();
-
+	Cmd.DrawCommand();
 	glutIdleFunc(glutPostRedisplay);
 	glFlush();
 }
@@ -91,6 +90,5 @@ void Resize(int w, int h){
 	gluOrtho2D(0.0, 1.0, 0.0, 1.0);
 	Drawing.Init(w,h);
 }
-
 
 

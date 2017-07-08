@@ -11,10 +11,12 @@
 #endif
 
 #include<GRAPPA.h>
+#include<Command.h>
 
 extern bool MFLAG; //defined in Mouse.cpp
 extern bool M_Nodrag; //defined in Mouce.cpp
 extern GRAPPA Drawing;
+extern Command Cmd;
 
 void MouseDrawMode(void);
 void KeyboardMode(void);
@@ -25,91 +27,91 @@ void MNDrag(void);
 void Commands(){
 	double Arg1,Arg2,Arg3;
 
-	if(Drawing.RunCommand("q","quit","exit"))
+	if(Cmd.RunCommand("q","quit","exit"))
 		exit(0);
 
-	else if(Drawing.RunCommand("undo"))
+	else if(Cmd.RunCommand("undo"))
 		Drawing.Undo();
 
-	else if(Drawing.RunCommand("redo"))
+	else if(Cmd.RunCommand("redo"))
 		Drawing.Redo();
 	
-	else if(Drawing.RunCommand("nodrag"))
+	else if(Cmd.RunCommand("nodrag"))
 		MNDrag();
 	
-	else if(Drawing.RunCommand("status"))
+	else if(Cmd.RunCommand("status"))
 		Drawing.Status();
 
-	else if(Drawing.RunCommand("reset"))
+	else if(Cmd.RunCommand("reset"))
 		Drawing.Reset();
 
-	else if(Drawing.RunCommand("mv"))
+	else if(Cmd.RunCommand("mv"))
 		Drawing.SetDrawMode(MLINEMOVE);
 		
-	else if(Drawing.RunCommand("cp"))
+	else if(Cmd.RunCommand("cp"))
 		Drawing.SetDrawMode(MLINECOPY);
 		
-	else if(Drawing.RunCommand("rotate"))
+	else if(Cmd.RunCommand("rotate"))
 		Drawing.SetDrawMode(MLINEROTATE);
 		
-	else if(Drawing.RunCommand("co"))
+	else if(Cmd.RunCommand("co"))
 		Drawing.SetDrawMode(MCOLORBARLINE);
 
-	else if(Drawing.RunCommand("co",&Arg1,&Arg2,&Arg3))
+	else if(Cmd.RunCommand("co",&Arg1,&Arg2,&Arg3))
 		Drawing.SetLineColor(Arg1,Arg2,Arg3);
 
-	else if(Drawing.RunCommand("cco"))
+	else if(Cmd.RunCommand("cco"))
 		Drawing.SetDrawMode(MCOLORBARCANVAS);
 
-	else if(Drawing.RunCommand("cco",&Arg1,&Arg2,&Arg3))
+	else if(Cmd.RunCommand("cco",&Arg1,&Arg2,&Arg3))
 		Drawing.SetCanvasColor(Arg1,Arg2,Arg3);
 
-	else if(Drawing.RunCommand("dco",&Arg1,&Arg2,&Arg3))
+	else if(Cmd.RunCommand("dco",&Arg1,&Arg2,&Arg3))
 		Drawing.SetDefaultLineColor(Arg1,Arg2,Arg3);
 
-	else if(Drawing.RunCommand("cor"))
+	else if(Cmd.RunCommand("cor"))
 		Drawing.SetLineColor(1.0,0.0,0.0);
 
-	else if(Drawing.RunCommand("cog"))
+	else if(Cmd.RunCommand("cog"))
 		Drawing.SetLineColor(0.0,1.0,0.0);
 
-	else if(Drawing.RunCommand("cob"))
+	else if(Cmd.RunCommand("cob"))
 		Drawing.SetLineColor(0.0,0.0,1.0);
 
-	else if(Drawing.RunCommand("coy"))
+	else if(Cmd.RunCommand("coy"))
 		Drawing.SetLineColor(1.0,1.0,0.0);
 
-	else if(Drawing.RunCommand("lw",&Arg1))
+	else if(Cmd.RunCommand("lw",&Arg1))
 		Drawing.SetLineWidth(Arg1);
 
-	else if(Drawing.RunCommand("dlw",&Arg1))
+	else if(Cmd.RunCommand("dlw",&Arg1))
 		Drawing.SetDefaultLineWidth(Arg1);
 
-	else if(Drawing.RunCommand("p","pixel"))
+	else if(Cmd.RunCommand("p","pixel"))
 		Drawing.PixelMode();
 
-	else if(Drawing.RunCommand("ps",&Arg1))
+	else if(Cmd.RunCommand("ps",&Arg1))
 		Drawing.SetPixelSize(Arg1);
 
-	else if(Drawing.RunCommand("eraser"))
+	else if(Cmd.RunCommand("eraser"))
 		Drawing.PixelEraser();
 
-	else if(Drawing.RunCommand("circle"))
+	else if(Cmd.RunCommand("circle"))
 		Drawing.SetDrawMode(MCIRCLE);
 
-	else if(Drawing.RunCommand("square"))
+	else if(Cmd.RunCommand("square"))
 		Drawing.SetDrawMode(MSQUARE);
 
-	else if(Drawing.RunCommand("polygon",&Arg1))
+	else if(Cmd.RunCommand("polygon",&Arg1))
 		Drawing.SetDrawMode(MPOLYGON,Arg1);
 
-	else if(Drawing.RunCommand("line"))
+	else if(Cmd.RunCommand("line"))
 		Drawing.SetDrawMode(MSTRAIGHTLINE);
 
-	else if(Drawing.RunCommand("rand"))
+	else if(Cmd.RunCommand("rand"))
 		Drawing.SetDrawMode(MRANDOM);
 
-	else if(Drawing.RunCommand("kaleido"))
+	else if(Cmd.RunCommand("kaleido"))
 		Drawing.SetDrawMode(MKALEIDO);
 
 }
@@ -117,19 +119,19 @@ void Commands(){
 
 void InputKey(unsigned char key, int x, int y){
 	if(key == 127){ //delete key
-		int size = Drawing.CommandStore(key);
+		int size = Cmd.CommandStore(key);
 		if(size == 0) KeyboardMode();
 	}
 	else if(key == 13){ //return key
 		Commands();
-		Drawing.CommandStore(key);
+		Cmd.CommandStore(key);
 		KeyboardMode();
 	}
 	else if(key == 9){ //tab key
 		;
 	}
 	else{
-		Drawing.CommandStore(key);
+		Cmd.CommandStore(key);
 	}
 }
 
@@ -137,8 +139,8 @@ void InputKey(unsigned char key, int x, int y){
 /* arrow key */
 void keyboard_sp(int key, int x, int y){
 	if(key==GLUT_KEY_UP||key==GLUT_KEY_DOWN)
-		Drawing.CommandHistory(key);
+		Cmd.CommandHistory(key);
 	if(key==GLUT_KEY_RIGHT||key==GLUT_KEY_LEFT)
-		Drawing.CommandCursor(key);
+		Cmd.CommandCursor(key);
 }
 
