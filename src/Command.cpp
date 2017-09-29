@@ -3,7 +3,8 @@
 */
 
 #ifdef __APPLE__
-#include<GLUT/glut.h>
+// #include<GLUT/glut.h>
+#include<GL/freeglut.h>
 #endif
 
 #ifdef linux
@@ -29,6 +30,9 @@ void Commands(){
 
 	if(Cmd.RunCommand("q","quit","exit"))
 		exit(0);
+
+	else if(Cmd.RunCommand("h","help"))
+		Cmd.Help();
 
 	else if(Cmd.RunCommand("undo"))
 		Drawing.Undo();
@@ -81,16 +85,16 @@ void Commands(){
 	else if(Cmd.RunCommand("coy"))
 		Drawing.SetLineColor(1.0,1.0,0.0);
 
-	else if(Cmd.RunCommand("lw",&Arg1))
+	else if(Cmd.RunCommand("lw","width",&Arg1))
 		Drawing.SetLineWidth(Arg1);
 
-	else if(Cmd.RunCommand("dlw",&Arg1))
+	else if(Cmd.RunCommand("dlw","defaultwidth",&Arg1))
 		Drawing.SetDefaultLineWidth(Arg1);
 
 	else if(Cmd.RunCommand("p","pixel"))
 		Drawing.PixelMode();
 
-	else if(Cmd.RunCommand("ps",&Arg1))
+	else if(Cmd.RunCommand("ps","pixelsize",&Arg1))
 		Drawing.SetPixelSize(Arg1);
 
 	else if(Cmd.RunCommand("eraser"))

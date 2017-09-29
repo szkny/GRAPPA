@@ -4,7 +4,8 @@
 /*****************************/
 
 #ifdef __APPLE__
-#include<GLUT/glut.h>
+// #include<GLUT/glut.h>
+#include<GL/freeglut.h>
 #endif
 
 #ifdef linux
@@ -65,43 +66,43 @@ class GRAPPA{
 	public:
 		GRAPPA();
 		~GRAPPA();
-		inline void Init(int WX, int XY);
-		inline void Reset();
-		inline void NewFreeHand();
-		inline void Undo();
-		inline void Redo();
-		inline void EraseLine();
-		inline void DrawColorBar();
-		inline void SetCanvasColor(double R, double G, double B);
-		inline void SetLineColor(double R, double G, double B);
-		inline void SetDefaultLineColor(double R, double G, double B);
-		inline void SetLineWidth(double w);
-		inline void SetDefaultLineWidth(double w);
-		inline void SetPixelSize(int size);
-		inline int  CurrentDrawMode();
-		inline void SetDrawMode(int mode);
-		inline void SetDrawMode(int mode,int N_side);
-		inline void SetCoordinate(int x, int y);
-		inline void SetLineCircle(int x, int y);
-		inline void SetLineSquare(int x, int y);
-		inline void SetLinePolygon(int x, int y);
-		inline void SetStraightLine(int x, int y);
-		inline void SetRandom(int x, int y);
-		inline void SetKaleido(int x, int y);
-		inline void LineMove(int x, int y);
-		inline void LineCopy(int x, int y);
-		inline void LineRotate(int x, int y);
-		inline void PixelMode();
-		inline void FillPixel();
-		inline void FillTmpPixel();
-		inline void UndoPixel();
-		inline void PixelEraser();
-		inline bool PixelEraserFlag();
-		inline void DrawCanvas();
-		inline void DrawGlutLine();
-		inline void DrawPixel();
-		inline void DrawDisplay();
-		inline void Status();
+		void Init(int WX, int XY);
+		void Reset();
+		void NewFreeHand();
+		void Undo();
+		void Redo();
+		void EraseLine();
+		void DrawColorBar();
+		void SetCanvasColor(double R, double G, double B);
+		void SetLineColor(double R, double G, double B);
+		void SetDefaultLineColor(double R, double G, double B);
+		void SetLineWidth(double w);
+		void SetDefaultLineWidth(double w);
+		void SetPixelSize(int size);
+		int  CurrentDrawMode();
+		void SetDrawMode(int mode);
+		void SetDrawMode(int mode,int N_side);
+		void SetCoordinate(int x, int y);
+		void SetLineCircle(int x, int y);
+		void SetLineSquare(int x, int y);
+		void SetLinePolygon(int x, int y);
+		void SetStraightLine(int x, int y);
+		void SetRandom(int x, int y);
+		void SetKaleido(int x, int y);
+		void LineMove(int x, int y);
+		void LineCopy(int x, int y);
+		void LineRotate(int x, int y);
+		void PixelMode();
+		void FillPixel();
+		void FillTmpPixel();
+		void UndoPixel();
+		void PixelEraser();
+		bool PixelEraserFlag();
+		void DrawCanvas();
+		void DrawGlutLine();
+		void DrawPixel();
+		void DrawDisplay();
+		void Status();
 };
 
 
@@ -520,7 +521,7 @@ inline void GRAPPA::SetKaleido(int x, int y){
 	static int x0;
 	static int y0;
 	if(!TmpFlag){
-		hue2rgb C(LineID,20);
+		hue2rgb C(LineID,10);
 		SetDefaultLineColor(C.R(),C.G(),C.B());
 		++LineID;
 		FillTmpPixel();
@@ -544,7 +545,7 @@ inline void GRAPPA::SetKaleido(int x, int y){
 		Py[Counter[LineID]][LineID] = yc+r*sin((double)i/CircleSample*2*PI+theta);
 		++Counter[LineID];
 		if(FreeMAX-1<Counter[LineID]){
-			hue2rgb C(LineID,20);
+			hue2rgb C(LineID,10);
 			SetDefaultLineColor(C.R(),C.G(),C.B());
 			++LineID;
 		}

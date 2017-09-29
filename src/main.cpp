@@ -12,7 +12,8 @@
 #include<string.h>
 
 #ifdef __APPLE__
-#include<GLUT/glut.h>
+// #include<GLUT/glut.h>
+#include<GL/freeglut.h>
 #endif
 
 #ifdef linux
@@ -53,8 +54,8 @@ int main(int argc, char *argv[]){
 /******** Functions *********/
 
 void WindowCanvas(void){
-	glutInitWindowPosition(900,0);
-	glutInitWindowSize(800,500);
+	glutInitWindowPosition(0,0);
+	glutInitWindowSize(500,400);
 	glutInitDisplayMode(GLUT_RGBA);
 	glutCreateWindow("GRAPPA PAINT");
 	glutDisplayFunc(Display);

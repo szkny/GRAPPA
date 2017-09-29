@@ -4,7 +4,8 @@
 /*****************************/
 
 #ifdef __APPLE__
-#include<GLUT/glut.h>
+// #include<GLUT/glut.h>
+#include<GL/freeglut.h>
 #endif
 
 #ifdef linux
@@ -25,6 +26,7 @@ class Command{
 		int  HstCounter; /* Go Back Counter for CommandHistory */
 	public:
 		Command();
+		inline void Help();
 		inline void DrawCommand();
 		inline void CommandMode();
 		inline bool CommandFlag();
@@ -38,6 +40,7 @@ class Command{
 		inline bool RunCommand(const char *s0, double *a1, double *a2);
 		inline bool RunCommand(const char *s0, double *a1, double *a2, double *a3);
 		inline bool RunCommand(const char *s0, double *a1, double *a2, double *a3, double *a4);
+		inline bool RunCommand(const char *s0, const char *s1, double *a1);
 };
 
 
@@ -47,6 +50,32 @@ inline Command::Command(){
 	CmdID = 0;
 	CmdCursor = 0;
 	HstCounter = 0;
+}
+
+
+inline void Command::Help(){
+	printf("\n\033[30m");
+	printf( "\033[47m+——————————————–—[ USAGE ]–———————————————+\033[49m\n"
+			"\033[47m| let's try the following commands.       |\033[49m\n"
+			"\033[47m|   circle  … draw circle.                |\033[49m\n"
+			"\033[47m|   square  … draw square.                |\033[49m\n"
+			"\033[47m|   polygon … draw polygon.               |\033[49m\n"
+			"\033[47m|   line    … draw line.                  |\033[49m\n"
+			"\033[47m|   rand    … draw random line.           |\033[49m\n"
+			"\033[47m|   kaleido … draw kaleido.               |\033[49m\n"
+			"\033[47m|   undo    … undo draw line.             |\033[49m\n"
+			"\033[47m|   redo    … redo draw line.             |\033[49m\n"
+			"\033[47m|   status  … show status.                |\033[49m\n"
+			"\033[47m|   mv      … move line.                  |\033[49m\n"
+			"\033[47m|   cp      … copy line.                  |\033[49m\n"
+			"\033[47m|   dco     … change default line color.  |\033[49m\n"
+			"\033[47m|   lw      … change line width.          |\033[49m\n"
+			"\033[47m|   dlw     … change default line width.  |\033[49m\n"
+			"\033[47m|   pixel   … pixel mode.                 |\033[49m\n"
+			"\033[47m|   eraser  … pixel eraser.               |\033[49m\n"
+			"\033[47m+——————————————————————–—————–————————————+\033[49m\n");
+	printf("\033[39m");
+	fflush(stdout);
 }
 
 
@@ -63,7 +92,7 @@ inline void Command::DrawCommand(){
 			memset(s,'\0',sizeof(s));
 			sprintf(s,":%s",CommandString[CmdID]);
 			int size = strlen(s);
-			memset(s+size-CmdCursor,'|',1);
+			memset(s+size-CmdCursor,'_',1);
 			if(count%32==0) flag = true;
 		}
 		++count;
@@ -115,7 +144,7 @@ inline int Command::CommandStore(unsigned char key){
 				CMFLAG = false;
 			}
 		}
-		else{ //character input
+		else{ //input charactors
 			if(CmdCursor&&CmdCursor<=size&&size<32){
 				char tmp[128];
 				memset(tmp,'\0',sizeof(tmp));
@@ -278,6 +307,20 @@ inline bool Command::RunCommand(const char *s0, double *a1, double *a2, double *
 	return match;
 }
 
+
+inline bool Command::RunCommand(const char *s0, const char *s1, double *a1){
+	char Command[64];
+	double arg1 = 0.0;
+	sscanf(CommandString[CmdID],"%s %lf",Command,&arg1);
+	bool match = false;
+	if(!strcmp(Command,s0)) match = true;
+	if(!strcmp(Command,s1)) match = true;
+	if(match){
+		(*a1) = arg1;
+		printf("Command:%s\t%f\n",Command,(*a1));
+	}
+	return match;
+}
 
 
 /*****************************/
