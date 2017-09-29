@@ -3,7 +3,8 @@
 */
 
 #ifdef __APPLE__
-#include<GLUT/glut.h>
+// #include<GLUT/glut.h>
+#include<GL/freeglut.h>
 #endif
 
 #ifdef linux
