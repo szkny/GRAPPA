@@ -72,6 +72,9 @@ inline void Command::Help(){
             "\033[47m|   dlw     … change default line width.  |\033[49m\n"
             "\033[47m|   pixel   … pixel mode.                 |\033[49m\n"
             "\033[47m|   eraser  … pixel eraser.               |\033[49m\n"
+            "\033[47m|   save    … save current sketch.        |\033[49m\n"
+            "\033[47m|   load    … load saved data.            |\033[49m\n"
+            "\033[47m|   quit    … quit GRAPPA.                |\033[49m\n"
             "\033[47m+——————————————————————–—————–————————————+\033[49m\n");
     printf("\033[39m");
     fflush(stdout);

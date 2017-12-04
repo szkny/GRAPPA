@@ -374,8 +374,10 @@ inline void GRAPPA::SetDrawMode(){
 
 inline void GRAPPA::SetDrawMode(int mode){
     if(TmpFlag) TmpFlag = false;
-    TmpDrawMode = DrawMode;
-    DrawMode = mode;
+    if(mode != DrawMode){
+        TmpDrawMode = DrawMode;
+        DrawMode = mode;
+    }
 }
 
 

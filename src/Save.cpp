@@ -8,7 +8,16 @@ extern GRAPPA Drawing;
 const char *savefile = ".save.gra";
 
 void Save(){
+    if(!Drawing.LineID) return;
     FILE *fp_save = fopen(savefile,"w");
+    time_t timer  = time(NULL);
+    struct tm *local = localtime(&timer);
+    char date[50];
+    sprintf(date,"%04d/%02d/%02d_%02d:%02d:%02d",
+            local->tm_year+1900,local->tm_mon+1,
+            local->tm_mday,local->tm_hour,local->tm_min,local->tm_sec);
+    printf("save data (%s)\n",date);
+    fprintf(fp_save,"#-- %s --#\n",date);
     for(int i=1;i<=Drawing.LineID;++i){
         fprintf(fp_save,"# ID: %d\n",i);
         fprintf(fp_save,"# width: %lf\n",Drawing.LineWidth[i]);
@@ -30,16 +39,19 @@ void Load(){
     Drawing.Reset();
     FILE *fp_load = fopen(savefile,"r");
     if(!fp_load){
-        printf("file not found. : %s\n",savefile);
+        printf("file not found. -> %s\n",savefile);
         return;
     }
-    char buf[50];
-    char param[50];
+    char buf[50],param[50],date[50];
     int  id = 0;
     int  counter = 0;
     double tmp[3];
     bool PosFlag = false;
     fseek(fp_load,0,SEEK_SET);
+    fgets(buf,sizeof(buf),fp_load);
+    sscanf(buf,"#-- %s --#",date);
+    printf("\tloading data (%s)\n",date);
+    fflush(stdout);
     while(fgets(buf,sizeof(buf),fp_load) != NULL){
         if(!strncmp(buf,"#",1)){
             sscanf(buf,"%*c %s %lf %lf %lf",param,&tmp[0],&tmp[1],&tmp[2]);
@@ -69,6 +81,7 @@ void Load(){
         }
     }
     fclose(fp_load);
+    remove(savefile);
 }
 
 
