@@ -29,6 +29,9 @@ void KeyboardShortcut(unsigned char key, int x, int y){
         case 'u': /* Undo */
             Drawing.Undo();
             break;
+        case 'c': /* Color */
+            Drawing.SetDrawMode(MCOLORBARLINE);
+            break;
         case 'r': /* Redo */
             Drawing.Redo();
             break;
