@@ -399,8 +399,7 @@ inline void GRAPPA::SetCoordinate(int x, int y){
                     Px[Counter[LineID]][LineID] = x;
                     Py[Counter[LineID]][LineID] = y;
                     Counter[LineID]++;
-                }
-                else{
+                }else{
                     LineID++;
                     if(LineNum<=LineID) LineID = 0;
                     if(ERFLAG) ++PixelEraserCounter;
@@ -474,7 +473,7 @@ inline void GRAPPA::SetLineCircle(int x, int y){
     static int x0;
     static int y0;
     if(!TmpFlag){
-        ++LineID;
+        // ++LineID;
         FillTmpPixel();
         x0 = x;
         y0 = y;
@@ -498,7 +497,7 @@ inline void GRAPPA::SetLineSquare(int x, int y){
     static int x0;
     static int y0;
     if(!TmpFlag){
-        ++LineID;
+        // ++LineID;
         FillTmpPixel();
         x0 = x;
         y0 = y;
@@ -519,7 +518,7 @@ inline void GRAPPA::SetLinePolygon(int x, int y){
     static int x0;
     static int y0;
     if(!TmpFlag){
-        ++LineID;
+        // ++LineID;
         FillTmpPixel();
         x0 = x;
         y0 = y;
@@ -541,7 +540,7 @@ inline void GRAPPA::SetLinePolygon(int x, int y){
 
 inline void GRAPPA::SetStraightLine(int x, int y){
     if(!TmpFlag){
-        ++LineID;
+        // ++LineID;
         FillTmpPixel();
         Px[0][LineID] = x;
         Py[0][LineID] = y;
@@ -557,7 +556,7 @@ inline void GRAPPA::SetStraightLine(int x, int y){
 
 inline void GRAPPA::SetRandom(int x, int y){
     if(!TmpFlag){
-        ++LineID;
+        // ++LineID;
         TmpFlag = true;
     }
     Px[Counter[LineID]][LineID] = x+10*(2*randf()-1)*LineWidth[LineID];
