@@ -16,7 +16,7 @@ COMPILER:= g++
 UNAME   := $(shell uname)
 ifeq ($(UNAME), Darwin)
 CFLAGS  += -Wall -O2
-FRAME   := -framework GLUT -framework OpenGL 
+FRAME   := -framework GLUT -framework OpenGL
 endif
 ifeq ($(UNAME), Linux)
 CFLAGS  += -w -O2 -I/usr/X11R6/include -L/usr/X11R6/lib -lglut -lGLU -lGL -lXmu -lXi -lXext -lX11 -lm -lpthread
@@ -44,7 +44,7 @@ build: $(NAME)
 	@echo "       Complete to create $(NAME) into $(EXE_DIR)  "
 	@echo "          Let's try doing $(EXE_DIR)/$(NAME) !     "
 	@echo "    —————————————————————————————————————————————  "
- 
+
 $(NAME): $(OBJECTS)
 	-@mkdir -p $(EXE_DIR)
 	@echo " —— linking objects & create $(NAME)"
@@ -61,6 +61,6 @@ run:
 	@echo " —— running $(NAME)"
 	@$(EXE_DIR)/$(NAME)
 
-clean: 
+clean:
 	@echo " —— clean up objects"
 	$(RM) $(OBJECTS)

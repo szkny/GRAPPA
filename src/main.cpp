@@ -1,9 +1,9 @@
 /* main.cpp
-*
-*	main source for GRAPPA PAINT  
-*		(c) M.Haroon, S.Suzuki 2017.4.26 (origin)
-*					patch ———— 2017.6.19 (vol0.2.2)
-*/
+ *
+ *  main source for GRAPPA PAINT
+ *      (c) M.Haroon, S.Suzuki 2017.4.26 (origin)
+ *          patch ———— 2017.6.19 (vol0.2.2)
+ */
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -30,6 +30,7 @@ void MouseDrawMode(void);
 void KeyboardMode(void);
 void PopUpMenu(void);
 void Display(void);
+void Timer(int value);
 void Resize(int w, int h);
 void MouseClick(int button, int state, int x, int y);
 void MouseMotion(int x, int y);
@@ -43,53 +44,61 @@ Command Cmd;
 
 /* main function */
 int main(int argc, char *argv[]){
-	glutInit(&argc, argv);
-	WindowCanvas();
-	PopUpMenu();
-	Controler();
-	glutMainLoop();
-	return 0;
+    glutInit(&argc, argv);
+    WindowCanvas();
+    PopUpMenu();
+    // Controler();
+    glutMainLoop();
+    return 0;
 }
 
 /******** Functions *********/
 
 void WindowCanvas(void){
-	glutInitWindowPosition(0,0);
-	glutInitWindowSize(500,400);
-	glutInitDisplayMode(GLUT_RGBA);
-	glutCreateWindow("GRAPPA PAINT");
-	glutDisplayFunc(Display);
-	glutReshapeFunc(Resize);
-	glClearColor(0.2,0.2,0.2,1.0);
+    glutInitWindowPosition(0,0);
+    glutInitWindowSize(500,400);
+    glutInitDisplayMode(GLUT_RGBA);
+    glutCreateWindow("GRAPPA PAINT");
+    glutDisplayFunc(Display);
+    glutTimerFunc(10,Timer,0);
+    glutReshapeFunc(Resize);
+    glClearColor(0.2,0.2,0.2,1.0);
 }
 
 
 void Controler(void){
-	glutMouseFunc(MouseClick);
-	MouseDrawMode();
-	KeyboardMode();
-	glutSpecialFunc(keyboard_sp);
+    glutMouseFunc(MouseClick);
+    MouseDrawMode();
+    KeyboardMode();
+    glutSpecialFunc(keyboard_sp);
 }
 
 
 void Display(void){
-	glClear(GL_COLOR_BUFFER_BIT);
-	Drawing.DrawPixel();
-	Drawing.DrawCanvas();
-	Drawing.DrawGlutLine();
-	Drawing.DrawColorBar();
-	Drawing.DrawDisplay();
-	Cmd.DrawCommand();
-	glutIdleFunc(glutPostRedisplay);
-	glFlush();
+    glClear(GL_COLOR_BUFFER_BIT);
+    Drawing.DrawPixel();
+    Drawing.DrawCanvas();
+    Drawing.DrawGlutLine();
+    Drawing.DrawColorBar();
+    Drawing.DrawDisplay();
+    Cmd.DrawCommand();
+    glutIdleFunc(glutPostRedisplay);
+    glFlush();
+}
+
+
+void Timer(int value){
+    Controler();
+    glutPostRedisplay();
+    glutTimerFunc(10,Timer,0);
 }
 
 
 void Resize(int w, int h){
-	glViewport(0, 0, w ,h);
-	glLoadIdentity();
-	gluOrtho2D(0.0, 1.0, 0.0, 1.0);
-	Drawing.Init(w,h);
+    glViewport(0, 0, w ,h);
+    glLoadIdentity();
+    gluOrtho2D(0.0, 1.0, 0.0, 1.0);
+    Drawing.Init(w,h);
 }
 
 
