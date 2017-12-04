@@ -4,7 +4,6 @@
 /*****************************/
 
 #ifdef __APPLE__
-// #include<GLUT/glut.h>
 #include<GL/freeglut.h>
 #endif
 
@@ -41,7 +40,7 @@
 #define CircleSample 50
 
 class GRAPPA{
-    private:
+    public:
         double Cmargin; /* Margin of Canvas (%) */
         int    WX,WY;   /* Window Size */
         double CanvasColor[3]; /* Canvas Color R,G,B */
@@ -226,8 +225,12 @@ inline void GRAPPA::Redo(){
 
 
 inline void GRAPPA::EraseLine(){
-    if(Counter[LineID]) --Counter[LineID];
-    else if(LineID) --LineID;
+    if(PXFLAG){
+        PixelEraser();
+    }else{
+        if(Counter[LineID]) --Counter[LineID];
+        else if(LineID) --LineID;
+    }
 }
 
 
@@ -473,7 +476,6 @@ inline void GRAPPA::SetLineCircle(int x, int y){
     static int x0;
     static int y0;
     if(!TmpFlag){
-        // ++LineID;
         FillTmpPixel();
         x0 = x;
         y0 = y;
@@ -497,7 +499,6 @@ inline void GRAPPA::SetLineSquare(int x, int y){
     static int x0;
     static int y0;
     if(!TmpFlag){
-        // ++LineID;
         FillTmpPixel();
         x0 = x;
         y0 = y;
@@ -518,7 +519,6 @@ inline void GRAPPA::SetLinePolygon(int x, int y){
     static int x0;
     static int y0;
     if(!TmpFlag){
-        // ++LineID;
         FillTmpPixel();
         x0 = x;
         y0 = y;
@@ -540,7 +540,6 @@ inline void GRAPPA::SetLinePolygon(int x, int y){
 
 inline void GRAPPA::SetStraightLine(int x, int y){
     if(!TmpFlag){
-        // ++LineID;
         FillTmpPixel();
         Px[0][LineID] = x;
         Py[0][LineID] = y;
@@ -556,7 +555,6 @@ inline void GRAPPA::SetStraightLine(int x, int y){
 
 inline void GRAPPA::SetRandom(int x, int y){
     if(!TmpFlag){
-        // ++LineID;
         TmpFlag = true;
     }
     Px[Counter[LineID]][LineID] = x+10*(2*randf()-1)*LineWidth[LineID];

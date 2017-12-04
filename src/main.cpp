@@ -12,7 +12,6 @@
 #include<string.h>
 
 #ifdef __APPLE__
-// #include<GLUT/glut.h>
 #include<GL/freeglut.h>
 #endif
 

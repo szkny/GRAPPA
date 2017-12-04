@@ -63,4 +63,4 @@ run:
 
 clean:
 	@echo " —— clean up objects"
-	$(RM) $(OBJECTS)
+	@$(RM) $(OBJECTS)
