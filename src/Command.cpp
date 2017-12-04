@@ -3,7 +3,6 @@
  */
 
 #ifdef __APPLE__
-// #include<GLUT/glut.h>
 #include<GL/freeglut.h>
 #endif
 
@@ -13,16 +12,15 @@
 
 #include<GRAPPA.h>
 #include<Command.h>
+#include<Save.h>
 
 extern bool MFLAG; //defined in Mouse.cpp
-extern bool M_Nodrag; //defined in Mouce.cpp
 extern GRAPPA Drawing;
 extern Command Cmd;
 
 void MouseDrawMode(void);
 void KeyboardMode(void);
 void KeyboardShortcut(unsigned char key, int x, int y);
-void MNDrag(void);
 
 
 void Commands(){
@@ -30,6 +28,11 @@ void Commands(){
 
     if(Cmd.RunCommand("q","quit","exit"))
         exit(0);
+
+    if(Cmd.RunCommand("wq")){
+        Save();
+        exit(0);
+    }
 
     else if(Cmd.RunCommand("h","help"))
         Cmd.Help();
@@ -39,9 +42,6 @@ void Commands(){
 
     else if(Cmd.RunCommand("redo"))
         Drawing.Redo();
-
-    else if(Cmd.RunCommand("nodrag"))
-        MNDrag();
 
     else if(Cmd.RunCommand("status"))
         Drawing.Status();
@@ -120,6 +120,12 @@ void Commands(){
 
     else if(Cmd.RunCommand("kaleido"))
         Drawing.SetDrawMode(MKALEIDO);
+
+    else if(Cmd.RunCommand("w","save"))
+        Save();
+
+    else if(Cmd.RunCommand("l","load"))
+        Load();
 
     fflush(stdout);
 }
