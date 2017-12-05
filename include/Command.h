@@ -18,6 +18,7 @@
 
 class Command{
     private:
+        int windowW,windowH; /* Window Size */
         bool CMFLAG; /* Command Line Flag */
         char CommandString[CmdNum][64]; /* Input Command String */
         int  CmdID;      /* Command LineID */
@@ -25,21 +26,22 @@ class Command{
         int  HstCounter; /* Go Back Counter for CommandHistory */
     public:
         Command();
-        inline void Help();
-        inline void DrawCommand();
-        inline void CommandMode();
-        inline bool CommandFlag();
-        inline int  CommandStore(unsigned char key);
-        inline int  CommandHistory(int key);
-        inline void CommandCursor(int key);
-        inline bool RunCommand(const char *s0);
-        inline bool RunCommand(const char *s0, const char *s1);
-        inline bool RunCommand(const char *s0, const char *s1, const char *s2);
-        inline bool RunCommand(const char *s0, double *a1);
-        inline bool RunCommand(const char *s0, double *a1, double *a2);
-        inline bool RunCommand(const char *s0, double *a1, double *a2, double *a3);
-        inline bool RunCommand(const char *s0, double *a1, double *a2, double *a3, double *a4);
-        inline bool RunCommand(const char *s0, const char *s1, double *a1);
+        void Resize(int WX, int WY);
+        void Help();
+        void DrawCommand();
+        void CommandMode();
+        bool CommandFlag();
+        int  CommandStore(unsigned char key);
+        int  CommandHistory(int key);
+        void CommandCursor(int key);
+        bool RunCommand(const char *s0);
+        bool RunCommand(const char *s0, const char *s1);
+        bool RunCommand(const char *s0, const char *s1, const char *s2);
+        bool RunCommand(const char *s0, double *a1);
+        bool RunCommand(const char *s0, double *a1, double *a2);
+        bool RunCommand(const char *s0, double *a1, double *a2, double *a3);
+        bool RunCommand(const char *s0, double *a1, double *a2, double *a3, double *a4);
+        bool RunCommand(const char *s0, const char *s1, double *a1);
 };
 
 
@@ -51,6 +53,11 @@ inline Command::Command(){
     HstCounter = 0;
 }
 
+
+inline void Command::Resize(int WX, int WY){
+    windowW = WX;
+    windowH = WY;
+}
 
 inline void Command::Help(){
     printf("\n\033[30m");
@@ -83,6 +90,22 @@ inline void Command::Help(){
 
 inline void Command::DrawCommand(){
     if(CMFLAG){
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        gluOrtho2D(0, windowW, windowH, 0);
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        glColor3d(0.00,0.10,0.15);
+        glBegin(GL_QUADS);
+        glVertex2d(0,windowH-30);
+        glVertex2d(windowW,windowH-30);
+        glVertex2d(windowW,windowH);
+        glVertex2d(0,windowH);
+        glEnd();
+        glColor3d(1,1,1);
         char s[256];
         static unsigned char count = 0;
         static bool flag = false;
@@ -98,7 +121,12 @@ inline void Command::DrawCommand(){
             if(count%32==0) flag = true;
         }
         ++count;
-        glDrawString2(s,0.01,0.02);
+        glDrawString2(s,5,windowH-10);
+
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
     }
 }
 

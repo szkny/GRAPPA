@@ -57,7 +57,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%$(SUFFIX) $(HEADERS)
 	@echo "[$(TAR)/$(TARNUM)]\t$(notdir $(basename $@))"
 	@$(COMPILER) $(OPTIONS) -o $@ -c $<
 
-run:
+run: $(NAME)
 	@echo " —— running $(NAME)"
 	@$(EXE_DIR)/$(NAME)
 

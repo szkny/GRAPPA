@@ -43,6 +43,9 @@ Command Cmd;
 
 /* main function */
 int main(int argc, char *argv[]){
+    printf("\n\t\033[7m Welcom to GRAPPA \033[0m\n"
+            " please type ':' key to input commands.\n\n");
+    fflush(stdout);
     glutInit(&argc, argv);
     WindowCanvas();
     PopUpMenu();
@@ -98,6 +101,7 @@ void Resize(int w, int h){
     glLoadIdentity();
     gluOrtho2D(0.0, 1.0, 0.0, 1.0);
     Drawing.Init(w,h);
+    Cmd.Resize(w,h);
 }
 
 
