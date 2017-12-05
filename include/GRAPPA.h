@@ -22,7 +22,7 @@
 #define Ypixel 125
 
 /* Mouse Mode */
-#define NUMBEROFMODE    100
+#define MAXMODENUMBER   100
 #define MFREEHAND         0
 #define MCIRCLE           1
 #define MSQUARE           2
@@ -191,7 +191,7 @@ inline void GRAPPA::Reset(){
 
 
 inline void GRAPPA::NewFreeHand(){
-    if(DrawMode<NUMBEROFMODE){
+    if(DrawMode<MAXMODENUMBER){
         if(TmpFlag) TmpFlag = false;
         LineID++;
         if(LineNum<LineID) LineID = 0;
@@ -836,16 +836,17 @@ inline void GRAPPA::DrawGlutLine(){
             else{
                 glBegin(GL_LINE_STRIP);
                 for(int i=0;i<Counter[j];++i){
-                    if((double)Px[i][j]<=(double)Cmargin/100*WX)
-                        glVertex2d((double)Cmargin/100,1-(double)Py[i][j]/WY);
-                    else if((double)(100-Cmargin)/100*WX<=(double)Px[i][j])
-                        glVertex2d(1.0-(double)Cmargin/100,1-(double)Py[i][j]/WY);
-                    else if((double)Py[i][j]<=(double)Cmargin/100*WY)
-                        glVertex2d((double)Px[i][j]/WX,1.0-(double)Cmargin/100);
-                    else if((double)(100-Cmargin)/100*WY<=(double)Py[i][j])
-                        glVertex2d((double)Px[i][j]/WX,(double)Cmargin/100);
-                    else
-                        glVertex2d((double)Px[i][j]/WX,1-(double)Py[i][j]/WY);
+                    glVertex2d((double)Px[i][j]/WX,1-(double)Py[i][j]/WY);
+                    // if((double)Px[i][j]<=(double)Cmargin/100*WX)
+                    //     glVertex2d((double)Cmargin/100,1-(double)Py[i][j]/WY);
+                    // else if((double)(100-Cmargin)/100*WX<=(double)Px[i][j])
+                    //     glVertex2d(1.0-(double)Cmargin/100,1-(double)Py[i][j]/WY);
+                    // else if((double)Py[i][j]<=(double)Cmargin/100*WY)
+                    //     glVertex2d((double)Px[i][j]/WX,1.0-(double)Cmargin/100);
+                    // else if((double)(100-Cmargin)/100*WY<=(double)Py[i][j])
+                    //     glVertex2d((double)Px[i][j]/WX,(double)Cmargin/100);
+                    // else
+                    //     glVertex2d((double)Px[i][j]/WX,1-(double)Py[i][j]/WY);
                 }
                 glEnd();
             }
@@ -872,6 +873,13 @@ inline void GRAPPA::DrawPixel(){
 
 
 inline void GRAPPA::DrawDisplay(){
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, WX, WY, 0);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
     if(CanvasColor[0]==CanvasColor[1]&&CanvasColor[1]==CanvasColor[2])
         glColor3d(0.5-CanvasColor[0],0.5-CanvasColor[1],1.0-CanvasColor[2]);
     else
@@ -882,21 +890,25 @@ inline void GRAPPA::DrawDisplay(){
         int x = (Counter[LineID]>1)? Px[Counter[LineID]-1][LineID]:0;
         int y = (Counter[LineID]>1)? Py[Counter[LineID]-1][LineID]:0;
         sprintf(s1,"[%d,%d]",x,y);
-        glDrawString(s1,(Cmargin+1)/100,(100-Cmargin-3)/100);
+        glDrawString(s1,10,15);
         sprintf(s1,"Line No. %d Length %d",LineID,Counter[LineID]);
-        glDrawString(s1,(Cmargin+1)/100,(100-Cmargin-6)/100);
+        glDrawString(s1,10,30);
 
         if(PXFLAG){
             GetDrawModeString(s2);
             sprintf(s1,"Mode : Pixel(%s)",s2);
-            glDrawString(s1,(Cmargin+1)/100,(100-Cmargin-9)/100);
+            glDrawString(s1,10,45);
         }
         else{
             GetDrawModeString(s2);
             sprintf(s1,"Mode : GLUT Line(%s)",s2);
-            glDrawString(s1,(Cmargin+1)/100,(100-Cmargin-9)/100);
+            glDrawString(s1,10,45);
         }
     }
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
 }
 
 
