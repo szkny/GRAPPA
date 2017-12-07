@@ -5,7 +5,7 @@
 #include<Save.h>
 
 extern GRAPPA Drawing;
-const char *savefile = ".save.gra";
+const char *savefile = ".data.gra";
 
 void Save(){
     if(!Drawing.LineID) return;
@@ -16,7 +16,7 @@ void Save(){
     sprintf(date,"%04d/%02d/%02d_%02d:%02d:%02d",
             local->tm_year+1900,local->tm_mon+1,
             local->tm_mday,local->tm_hour,local->tm_min,local->tm_sec);
-    printf("\tsave data (%s)\n",date);
+    printf("\tsave (%s) -> '%s'\n",date,savefile);
     fprintf(fp_save,"#-- %s --#\n",date);
     for(int i=1;i<=Drawing.LineID;++i){
         fprintf(fp_save,"# ID: %d\n",i);
@@ -36,12 +36,12 @@ void Save(){
 
 
 void Load(){
-    Drawing.Reset();
     FILE *fp_load = fopen(savefile,"r");
     if(!fp_load){
         printf("file not found. -> %s\n",savefile);
         return;
     }
+    Drawing.Reset();
     char buf[50],param[50],date[50];
     int  id = 0;
     int  counter = 0;
@@ -50,7 +50,7 @@ void Load(){
     fseek(fp_load,0,SEEK_SET);
     fgets(buf,sizeof(buf),fp_load);
     sscanf(buf,"#-- %s --#",date);
-    printf("\tloading data (%s)\n",date);
+    printf("\tload (%s) -> '%s'\n",date,savefile);
     fflush(stdout);
     while(fgets(buf,sizeof(buf),fp_load) != NULL){
         if(!strncmp(buf,"#",1)){

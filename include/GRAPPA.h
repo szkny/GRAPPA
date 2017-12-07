@@ -18,8 +18,8 @@
 #define LineNum 1000 /* Maximum Line Number of Free Hand */
 
 /* for Draw Pixel Mode */
-#define Xpixel 200
-#define Ypixel 125
+#define Xpixel 100
+#define Ypixel  80
 
 /* Mouse Mode */
 #define MAXMODENUMBER   100
