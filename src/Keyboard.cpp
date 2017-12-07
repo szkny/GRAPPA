@@ -59,4 +59,3 @@ void KeyboardMode(void){
     else glutKeyboardFunc(KeyboardShortcut);
 }
 
-
