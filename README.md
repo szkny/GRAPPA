@@ -1,18 +1,18 @@
 # GRAPPA
-Vim-like paint application powered by GLUT (for mac or Linux).         
+Vim-like paint application powered by GLUT (for mac or Linux).         
 
 ## download
 Execute "git clone" command.
 ```bash
 $ git clone https://github.com/szkny/GRAPPA.git
 ```
-Or extract the zip file and change directory to "GRAPPA-master".     
+Or extract the zip file.   
 ```bash:bash
 $ cd [Path to "GRAPPA-master.zip"]
 $ unzip GRAPPA-master.zip
 ```
 
-## installation (for mac)
+## install (mac)
 Change directory to "GRAPPA" or "GRAPPA-master", then
 ```bash:bash
 $ cd ./build
@@ -20,14 +20,14 @@ $ cmake ..
 $ make
 ```
 
-## installation (for Linux)
+## install (Linux)
 Change directory to "GRAPPA" or "GRAPPA-master", then
 ```bash:bash
 $ make
 ```
 
 ## demo
-Go to direcotry where "GRAPPA" executable exists ("build" directory).     
+Go to directory where "GRAPPA" executable exists ("build" directory).     
 Then, execute GRAPPA with "GRAPPA.gra" as an argument.
 ```bash:bash
 $ ./GRAPPA ../GRAPPA.gra
