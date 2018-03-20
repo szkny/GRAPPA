@@ -21,6 +21,7 @@
 
 #include<GRAPPA.h>
 #include<Command.h>
+#include<Save.h>
 
 /* Function Prototype Declaration */
 void WindowCanvas(void);
@@ -34,7 +35,7 @@ void Resize(int w, int h);
 void MouseClick(int button, int state, int x, int y);
 void keyboard_sp(int key, int x, int y);
 
-/* Declaration of new GRAPPA class */
+/* Declaration of GRAPPA classes */
 GRAPPA Drawing;
 Command Cmd;
 
@@ -44,6 +45,7 @@ int main(int argc, char *argv[]){
     printf("\n\t\033[7m Welcom to GRAPPA \033[0m\n"
             " please type ':' key to input commands.\n\n");
     fflush(stdout);
+    if(1<argc) Load(argv[1]);
     glutInit(&argc, argv);
     WindowCanvas();
     PopUpMenu();

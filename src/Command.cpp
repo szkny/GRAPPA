@@ -9,6 +9,7 @@
 extern bool MFLAG; //defined in Mouse.cpp
 extern GRAPPA Drawing;
 extern Command Cmd;
+extern const char *DefaultFileName;
 
 void MouseDrawMode(void);
 void KeyboardMode(void);
@@ -16,15 +17,11 @@ void KeyboardShortcut(unsigned char key, int x, int y);
 
 
 void Commands(){
-    double Arg1,Arg2,Arg3;
+    static double Arg1,Arg2,Arg3;
+    static char ArgString[200];
 
     if(Cmd.RunCommand("q","quit","exit"))
         exit(0);
-
-    if(Cmd.RunCommand("wq")){
-        Save();
-        exit(0);
-    }
 
     else if(Cmd.RunCommand("h","help"))
         Cmd.Help();
@@ -95,11 +92,16 @@ void Commands(){
     else if(Cmd.RunCommand("kaleido"))
         Drawing.SetDrawMode(MKALEIDO);
 
-    else if(Cmd.RunCommand("w","save"))
-        Save();
+    else if(Cmd.RunCommandString("w","save",ArgString))
+        Save(ArgString);
 
-    else if(Cmd.RunCommand("l","load"))
-        Load();
+    else if(Cmd.RunCommandString("e","edit",ArgString))
+        Load(ArgString);
+
+    else if(Cmd.RunCommandString("wq",ArgString)){
+        Save(ArgString);
+        exit(0);
+    }
 
     else
         Cmd.Notification();
