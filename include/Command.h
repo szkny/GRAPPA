@@ -43,6 +43,8 @@ class Command{
         bool RunCommand(const char *s0, double *a1, double *a2, double *a3);
         bool RunCommand(const char *s0, double *a1, double *a2, double *a3, double *a4);
         bool RunCommand(const char *s0, const char *s1, double *a1);
+        bool RunCommandString(const char *s0, char *arg);
+        bool RunCommandString(const char *s0, const char *s1, char *arg);
 };
 
 
@@ -69,20 +71,20 @@ inline void Command::Help(){
             "\033[47m|   polygon  - draw polygon.         |\033[49m\n"
             "\033[47m|   line     - draw line.            |\033[49m\n"
             "\033[47m|   rand     - draw random line.     |\033[49m\n"
-            "\033[47m|   kaleido  - draw kaleido.         |\033[49m\n"
+            // "\033[47m|   kaleido  - draw kaleido.         |\033[49m\n"
             "\033[47m|   undo     - undo draw line.       |\033[49m\n"
             "\033[47m|   redo     - redo draw line.       |\033[49m\n"
-            "\033[47m|   status   - show status.          |\033[49m\n"
             "\033[47m|   mv       - move line.            |\033[49m\n"
             "\033[47m|   cp       - copy line.            |\033[49m\n"
             "\033[47m|   co       - change line color.    |\033[49m\n"
             "\033[47m|   lw       - change line width.    |\033[49m\n"
-            "\033[47m|   pixel    - pixel mode.           |\033[49m\n"
-            "\033[47m|   eraser   - pixel eraser.         |\033[49m\n"
+            "\033[47m|   status   - show status.          |\033[49m\n"
+            // "\033[47m|   pixel    - pixel mode.           |\033[49m\n"
+            // "\033[47m|   eraser   - pixel eraser.         |\033[49m\n"
             "\033[47m|   save (w) - save current sketch.  |\033[49m\n"
-            "\033[47m|   load     - load saved data.      |\033[49m\n"
+            "\033[47m|   edit (e) - load saved data.      |\033[49m\n"
             "\033[47m|   quit (q) - quit GRAPPA.          |\033[49m\n"
-            "\033[47m+-----------------------------------+\033[49m\n");
+            "\033[47m+------------------------------------+\033[49m\n");
     printf("\033[39m");
     fflush(stdout);
 }
@@ -355,6 +357,29 @@ inline bool Command::RunCommand(const char *s0, const char *s1, double *a1){
         (*a1) = arg1;
         printf("Command:%s\t%f\n",Command,(*a1));
     }
+    return match;
+}
+
+
+inline bool Command::RunCommandString(const char *s0, char *arg){
+    static char Command[100];
+    sscanf(CommandString[CmdID],"%s %s",Command,arg);
+    bool match = false;
+    if(!strcmp(Command,s0)) match = true;
+    if(match)
+        printf("Command:%s\t'%s'\n",Command,arg);
+    return match;
+}
+
+
+inline bool Command::RunCommandString(const char *s0, const char *s1, char *arg){
+    static char Command[100];
+    sscanf(CommandString[CmdID],"%s %s",Command,arg);
+    bool match = false;
+    if(!strcmp(Command,s0)) match = true;
+    if(!strcmp(Command,s1)) match = true;
+    if(match)
+        printf("Command:%s\t'%s'\n",Command,arg);
     return match;
 }
 
