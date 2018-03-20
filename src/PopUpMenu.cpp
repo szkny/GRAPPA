@@ -14,67 +14,92 @@
 #include<MyGLUT.h>
 
 extern GRAPPA Drawing;
-
 void Menu(int val);
+
+enum POPUPMODE {
+    POPUP_QUIT=0,
+    POPUP_LINECOLOR,
+    POPUP_CANVASCOLOR,
+    POPUP_RESET,
+    POPUP_UNDO,
+    POPUP_REDO,
+    POPUP_COPY,
+    POPUP_MOVE,
+    POPUP_PIXEL,
+    POPUP_STRAIGHTLINE,
+    POPUP_CIRCLE,
+    POPUP_SQUARE,
+    POPUP_RANDOM,
+    POPUP_KALEIDO
+};
 
 void PopUpMenu(void){
     /* Sub Menu */
     int MenuID = glutCreateMenu(Menu);
-    glutAddMenuEntry("line",100);
-    glutAddMenuEntry("circle",101);
-    glutAddMenuEntry("square",102);
-    glutAddMenuEntry("random",103);
-    glutAddMenuEntry("kaleido",104);
+    glutAddMenuEntry("line",POPUP_STRAIGHTLINE);
+    glutAddMenuEntry("circle",POPUP_CIRCLE);
+    glutAddMenuEntry("square",POPUP_SQUARE);
+    glutAddMenuEntry("random",POPUP_RANDOM);
+    // glutAddMenuEntry("kaleido",POPUP_KALEIDO);
     /* Main Menu */
     glutCreateMenu(Menu);
-    glutAddMenuEntry("Select Line Color",1);
-    glutAddMenuEntry("Reset",2);
-    glutAddMenuEntry("Undo",3);
-    glutAddMenuEntry("Copy",4);
-    glutAddMenuEntry("Move",5);
-    glutAddMenuEntry("Pixel Mode",6);
+    glutAddMenuEntry("Select Line Color",POPUP_LINECOLOR);
+    glutAddMenuEntry("Select Canvas Color",POPUP_CANVASCOLOR);
+    glutAddMenuEntry("Reset All",POPUP_RESET);
+    glutAddMenuEntry("Undo",POPUP_UNDO);
+    glutAddMenuEntry("Redo",POPUP_REDO);
+    glutAddMenuEntry("Copy",POPUP_COPY);
+    glutAddMenuEntry("Move",POPUP_MOVE);
+    glutAddMenuEntry("Pixel Mode",POPUP_PIXEL);
     glutAddSubMenu("Drawing Mode",MenuID);
-    glutAddMenuEntry("Quit",0);
+    glutAddMenuEntry("Quit",POPUP_QUIT);
+    /* Assign Menu Button */
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
 void Menu(int val){
     switch(val){
-        case 0: /* Quit */
+        case POPUP_QUIT: /* Quit */
             exit(0);
-        case 1: /* Select Line Color */
+        case POPUP_LINECOLOR: /* Select Line Color */
             Drawing.SetDrawMode(MCOLORBARLINE);
             break;
-        case 2: /* Reset Lines */
+        case POPUP_CANVASCOLOR: /* Select Line Color */
+            Drawing.SetDrawMode(MCOLORBARCANVAS);
+            break;
+        case POPUP_RESET: /* Reset Lines */
             Drawing.Reset();
             break;
-        case 3: /* Undo */
+        case POPUP_UNDO: /* Undo */
             Drawing.Undo();
             break;
-        case 4: /* Copy */
+        case POPUP_REDO: /* Redo */
+            Drawing.Redo();
+            break;
+        case POPUP_COPY: /* Copy */
             Drawing.SetDrawMode(MLINECOPY);
             break;
-        case 5: /* Move */
+        case POPUP_MOVE: /* Move */
             Drawing.SetDrawMode(MLINEMOVE);
             break;
-        case 6: /* Pixel Mode */
+        case POPUP_PIXEL: /* Pixel Mode */
             Drawing.PixelMode();
             break;
-        case 100: /* Draw Line */
+        case POPUP_STRAIGHTLINE: /* Draw Line */
             Drawing.SetDrawMode(MSTRAIGHTLINE);
             break;
-        case 101: /* Draw Circle */
+        case POPUP_CIRCLE: /* Draw Circle */
             Drawing.SetDrawMode(MCIRCLE);
             break;
-        case 102: /* Draw Square */
+        case POPUP_SQUARE: /* Draw Square */
             Drawing.SetDrawMode(MSQUARE);
             break;
-        case 103: /* Draw Random */
+        case POPUP_RANDOM: /* Draw Random */
             Drawing.SetDrawMode(MRANDOM);
             break;
-        case 104: /* Draw Kaleido */
-            Drawing.SetDrawMode(MKALEIDO);
-            break;
+        // case POPUP_KALEIDO: #<{(| Draw Kaleido |)}>#
+        //     Drawing.SetDrawMode(MKALEIDO);
+        //     break;
         default:
             break;
     }

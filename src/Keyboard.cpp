@@ -2,14 +2,6 @@
  *  Keyboard Shortcuts Configurations
  */
 
-#ifdef __APPLE__
-#include<GL/freeglut.h>
-#endif
-
-#ifdef linux
-#include<GL/glut.h>
-#endif
-
 #include<GRAPPA.h>
 #include<Command.h>
 
@@ -42,7 +34,7 @@ void KeyboardShortcut(unsigned char key, int x, int y){
             Drawing.PixelMode();
             break;
         case 's': /* Show Status */
-            Drawing.Status();
+            Drawing.ShowStatus();
             break;
         case ':': /* Prompt Mode */
             Cmd.CommandMode();

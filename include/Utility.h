@@ -3,9 +3,9 @@
 
 /***************************/
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
+#include<cstdio>
+#include<cstdlib>
+#include<cmath>
 #include<string.h>
 
 #ifdef __APPLE__
@@ -16,8 +16,14 @@
 #include<GL/glut.h>
 #endif
 
-#include"define.h"
+//0~1の一様乱数の作成する関数
+inline double randf(void){
+    return (double)rand()/RAND_MAX;
+}
 
+#define PI M_PI
+
+#define EPS 2.220e-16
 
 /* Drawing String Function (string,position x,position y) */
 inline void glDrawString(const char *str, double x0, double y0){
@@ -38,6 +44,13 @@ inline void glDrawString2(const char *str, double x0, double y0){
         char ic = str[i];
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ic);
     }
+}
+
+typedef struct color{ double R,G,B; }color;
+
+/* glColor3d */
+inline void glColorStruct(color c){
+    glColor3d(c.R,c.G,c.B);
 }
 
 #endif //"MyGLUT_h_"
