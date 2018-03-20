@@ -16,9 +16,12 @@ $ make
 $ ./build/GRAPPA
 ```
 
+## screenshots
 ![GRAPPA image1](https://github.com/szkny/GRAPPA/wiki/images/movie2.gif)
 
 ![GRAPPA image1](https://github.com/szkny/GRAPPA/wiki/images/movie3.gif)
+
+![GRAPPA images](https://github.com/szkny/GRAPPA/wiki/images/GRAPPA_screenshot2.png)
 
 ![GRAPPA images](https://github.com/szkny/GRAPPA/wiki/images/GRAPPA_screenshot.png)
 
