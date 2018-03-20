@@ -16,7 +16,8 @@ $ unzip GRAPPA-master.zip
 Change directory to "GRAPPA" or "GRAPPA-master", then
 ```bash:bash
 $ cd ./build
-$ cmake .. && make
+$ cmake ..
+$ make
 ```
 
 ## installation (for Linux)
