@@ -3,6 +3,10 @@ Vim-like paint application for mac(OS X), Linux(CentOS) using GLUT.
 Extract the zip file and change directory to "GRAPPA-master", then make "GRAPPA".     
 
 ## installation (for mac)
+    $ cd [Path to "GRAPPA-master"]/GRAPPA-master/build
+    $ cmake .. && make
+    $ ./GRAPPA
+
 ```bash:bash
 $ cd [Path to "GRAPPA-master"]/GRAPPA-master/build
 $ cmake .. && make
