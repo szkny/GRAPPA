@@ -1,36 +1,41 @@
 # GRAPPA
 Vim-like paint application for mac(OS X), Linux(CentOS) using GLUT.         
-Extract the zip file and change directory to "GRAPPA-master", then make "GRAPPA".     
+
+## download
+Extract the zip file and change directory to "GRAPPA-master".     
+```bash:bash
+$ cd [Path to "GRAPPA-master.zip"]
+$ unzip GRAPPA-master.zip
+```
+Or execute "git clone" command.
+```bash
+$ git clone https://github.com/szkny/GRAPPA.git
+```
 
 ## installation (for mac)
-    $ cd [Path to "GRAPPA-master"]/GRAPPA-master/build
-    $ cmake .. && make
-    $ ./GRAPPA
-
+Change directory to "GRAPPA-master" or "GRAPPA", then
 ```bash:bash
-$ cd [Path to "GRAPPA-master"]/GRAPPA-master/build
+$ cd ./build
 $ cmake .. && make
-$ ./GRAPPA
 ```
 
 ## installation (for Linux)
+Change directory to "GRAPPA-master" or "GRAPPA", then
 ```bash:bash
-$ cd [Path to "GRAPPA-master"]/GRAPPA-master
 $ make
-$ ./build/GRAPPA
 ```
 
 ## demo
-Go to direcotry where "GRAPPA" executable exists.     
+Go to direcotry where "GRAPPA" executable exists ("build" directory).     
 Then, execute GRAPPA with "GRAPPA.gra" as an argument.
 ```bash:bash
 $ ./GRAPPA ../GRAPPA.gra
 ```
-As another way, after starting GRAPPA,
+As another way, after starting GRAPPA, type ":" to start the console mode, and enter the following command,
 ```vim:grappa consol
 :edit ../GRAPPA.gra
 ```
-The command "edit" can be omitted in "e".
+The command "edit" can simply written as "e".
 ```vim:grappa consol
 :e ../GRAPPA.gra
 ```
