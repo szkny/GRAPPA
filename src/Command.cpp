@@ -2,14 +2,6 @@
  *  GRAPPA Commands Configurations
  */
 
-#ifdef __APPLE__
-#include<GL/freeglut.h>
-#endif
-
-#ifdef linux
-#include<GL/glut.h>
-#endif
-
 #include<GRAPPA.h>
 #include<Command.h>
 #include<Save.h>
@@ -44,25 +36,25 @@ void Commands(){
         Drawing.Redo();
 
     else if(Cmd.RunCommand("status"))
-        Drawing.Status();
+        Drawing.ShowStatus();
 
-    else if(Cmd.RunCommand("reset"))
+    else if(Cmd.RunCommand("reset","clear"))
         Drawing.Reset();
 
-    else if(Cmd.RunCommand("mv"))
+    else if(Cmd.RunCommand("mv","move"))
         Drawing.SetDrawMode(MLINEMOVE);
 
-    else if(Cmd.RunCommand("cp"))
+    else if(Cmd.RunCommand("cp","copy"))
         Drawing.SetDrawMode(MLINECOPY);
 
-    else if(Cmd.RunCommand("rotate"))
+    else if(Cmd.RunCommand("rot","rotate"))
         Drawing.SetDrawMode(MLINEROTATE);
 
     else if(Cmd.RunCommand("co"))
         Drawing.SetDrawMode(MCOLORBARLINE);
 
     else if(Cmd.RunCommand("co",&Arg1,&Arg2,&Arg3))
-        Drawing.SetLineColor(Arg1,Arg2,Arg3);
+        Drawing.SetDefaultLineColor(Arg1,Arg2,Arg3);
 
     else if(Cmd.RunCommand("cco"))
         Drawing.SetDrawMode(MCOLORBARCANVAS);
@@ -70,25 +62,7 @@ void Commands(){
     else if(Cmd.RunCommand("cco",&Arg1,&Arg2,&Arg3))
         Drawing.SetCanvasColor(Arg1,Arg2,Arg3);
 
-    else if(Cmd.RunCommand("dco",&Arg1,&Arg2,&Arg3))
-        Drawing.SetDefaultLineColor(Arg1,Arg2,Arg3);
-
-    else if(Cmd.RunCommand("cor"))
-        Drawing.SetLineColor(1.0,0.0,0.0);
-
-    else if(Cmd.RunCommand("cog"))
-        Drawing.SetLineColor(0.0,1.0,0.0);
-
-    else if(Cmd.RunCommand("cob"))
-        Drawing.SetLineColor(0.0,0.0,1.0);
-
-    else if(Cmd.RunCommand("coy"))
-        Drawing.SetLineColor(1.0,1.0,0.0);
-
     else if(Cmd.RunCommand("lw","width",&Arg1))
-        Drawing.SetLineWidth(Arg1);
-
-    else if(Cmd.RunCommand("dlw","defaultwidth",&Arg1))
         Drawing.SetDefaultLineWidth(Arg1);
 
     else if(Cmd.RunCommand("p","pixel"))
@@ -100,7 +74,7 @@ void Commands(){
     else if(Cmd.RunCommand("erase","eraser"))
         Drawing.PixelEraser();
 
-    else if(Cmd.RunCommand("free"))
+    else if(Cmd.RunCommand("free","freehand"))
         Drawing.SetDrawMode(MFREEHAND);
 
     else if(Cmd.RunCommand("circle"))
@@ -115,7 +89,7 @@ void Commands(){
     else if(Cmd.RunCommand("line"))
         Drawing.SetDrawMode(MSTRAIGHTLINE);
 
-    else if(Cmd.RunCommand("rand"))
+    else if(Cmd.RunCommand("rand","random"))
         Drawing.SetDrawMode(MRANDOM);
 
     else if(Cmd.RunCommand("kaleido"))
@@ -126,6 +100,9 @@ void Commands(){
 
     else if(Cmd.RunCommand("l","load"))
         Load();
+
+    else
+        Cmd.Notification();
 
     fflush(stdout);
 }

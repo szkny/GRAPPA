@@ -11,7 +11,7 @@
 #include<GL/glut.h>
 #endif
 
-#include<MyGLUT.h>
+#include<Utility.h>
 #include<Colors.h>
 
 #define CmdNum  1000 /* Number of Stored Command */
@@ -28,6 +28,7 @@ class Command{
         Command();
         void Resize(int WX, int WY);
         void Help();
+        void Notification();
         void DrawCommand();
         void CommandMode();
         bool CommandFlag();
@@ -61,32 +62,37 @@ inline void Command::Resize(int WX, int WY){
 
 inline void Command::Help(){
     printf("\n\033[30m");
-    printf( "\033[47m+——————————————–—[ USAGE ]–———————————————+\033[49m\n"
-            "\033[47m| let's try the following commands.       |\033[49m\n"
-            "\033[47m|   circle  … draw circle.                |\033[49m\n"
-            "\033[47m|   square  … draw square.                |\033[49m\n"
-            "\033[47m|   polygon … draw polygon.               |\033[49m\n"
-            "\033[47m|   line    … draw line.                  |\033[49m\n"
-            "\033[47m|   rand    … draw random line.           |\033[49m\n"
-            "\033[47m|   kaleido … draw kaleido.               |\033[49m\n"
-            "\033[47m|   undo    … undo draw line.             |\033[49m\n"
-            "\033[47m|   redo    … redo draw line.             |\033[49m\n"
-            "\033[47m|   status  … show status.                |\033[49m\n"
-            "\033[47m|   mv      … move line.                  |\033[49m\n"
-            "\033[47m|   cp      … copy line.                  |\033[49m\n"
-            "\033[47m|   dco     … change default line color.  |\033[49m\n"
-            "\033[47m|   lw      … change line width.          |\033[49m\n"
-            "\033[47m|   dlw     … change default line width.  |\033[49m\n"
-            "\033[47m|   pixel   … pixel mode.                 |\033[49m\n"
-            "\033[47m|   eraser  … pixel eraser.               |\033[49m\n"
-            "\033[47m|   save    … save current sketch.        |\033[49m\n"
-            "\033[47m|   load    … load saved data.            |\033[49m\n"
-            "\033[47m|   quit    … quit GRAPPA.                |\033[49m\n"
-            "\033[47m+——————————————————————–—————–————————————+\033[49m\n");
+    printf( "\033[47m+-------------[ USAGE ]--------------+\033[49m\n"
+            "\033[47m| let's try the following commands.  |\033[49m\n"
+            "\033[47m|   circle   - draw circle.          |\033[49m\n"
+            "\033[47m|   square   - draw square.          |\033[49m\n"
+            "\033[47m|   polygon  - draw polygon.         |\033[49m\n"
+            "\033[47m|   line     - draw line.            |\033[49m\n"
+            "\033[47m|   rand     - draw random line.     |\033[49m\n"
+            "\033[47m|   kaleido  - draw kaleido.         |\033[49m\n"
+            "\033[47m|   undo     - undo draw line.       |\033[49m\n"
+            "\033[47m|   redo     - redo draw line.       |\033[49m\n"
+            "\033[47m|   status   - show status.          |\033[49m\n"
+            "\033[47m|   mv       - move line.            |\033[49m\n"
+            "\033[47m|   cp       - copy line.            |\033[49m\n"
+            "\033[47m|   co       - change line color.    |\033[49m\n"
+            "\033[47m|   lw       - change line width.    |\033[49m\n"
+            "\033[47m|   pixel    - pixel mode.           |\033[49m\n"
+            "\033[47m|   eraser   - pixel eraser.         |\033[49m\n"
+            "\033[47m|   save (w) - save current sketch.  |\033[49m\n"
+            "\033[47m|   load     - load saved data.      |\033[49m\n"
+            "\033[47m|   quit (q) - quit GRAPPA.          |\033[49m\n"
+            "\033[47m+-----------------------------------+\033[49m\n");
     printf("\033[39m");
     fflush(stdout);
 }
 
+inline void Command::Notification(){
+    char Command[100];
+    sscanf(CommandString[CmdID],"%s",Command);
+    printf("No such command. : '%s'\n",Command);
+    fflush(stdout);
+}
 
 inline void Command::DrawCommand(){
     if(CMFLAG){
@@ -272,7 +278,7 @@ inline bool Command::RunCommand(const char *s0, const char *s1, const char *s2){
 
 inline bool Command::RunCommand(const char *s0, double *a1){
     bool match = false;
-    char Command[64];
+    char Command[100];
     double arg1 = 0.0;
     sscanf(CommandString[CmdID],"%s %lf",Command,&arg1);
     if(!strcmp(Command,s0)) match = true;
@@ -286,7 +292,7 @@ inline bool Command::RunCommand(const char *s0, double *a1){
 
 inline bool Command::RunCommand(const char *s0, double *a1, double *a2){
     bool match = false;
-    char Command[64];
+    char Command[100];
     double arg1 = 0.0;
     double arg2 = 0.0;
     sscanf(CommandString[CmdID],"%s %lf %lf",Command,&arg1,&arg2);
@@ -302,7 +308,7 @@ inline bool Command::RunCommand(const char *s0, double *a1, double *a2){
 
 inline bool Command::RunCommand(const char *s0, double *a1, double *a2, double *a3){
     bool match = false;
-    char Command[64];
+    char Command[100];
     double arg1 = 0.0;
     double arg2 = 0.0;
     double arg3 = 0.0;
@@ -320,7 +326,7 @@ inline bool Command::RunCommand(const char *s0, double *a1, double *a2, double *
 
 inline bool Command::RunCommand(const char *s0, double *a1, double *a2, double *a3, double *a4){
     bool match = false;
-    char Command[64];
+    char Command[100];
     double arg1 = 0.0;
     double arg2 = 0.0;
     double arg3 = 0.0;
@@ -339,7 +345,7 @@ inline bool Command::RunCommand(const char *s0, double *a1, double *a2, double *
 
 
 inline bool Command::RunCommand(const char *s0, const char *s1, double *a1){
-    char Command[64];
+    char Command[100];
     double arg1 = 0.0;
     sscanf(CommandString[CmdID],"%s %lf",Command,&arg1);
     bool match = false;

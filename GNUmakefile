@@ -8,14 +8,14 @@ SUFFIX  := .cpp
 SRC_DIR := ./src
 INC_DIR := ./include
 OBJ_DIR := ./obj
-EXE_DIR := ./bin
+EXE_DIR := ./build
 
 COMPILER:= g++
 
 # cross platform make
 UNAME   := $(shell uname)
 ifeq ($(UNAME), Darwin)
-CFLAGS  += -Wall -O2
+CFLAGS  += -Wall -O2 -std=c++11
 FRAME   := -framework GLUT -framework OpenGL
 endif
 ifeq ($(UNAME), Linux)
@@ -40,10 +40,10 @@ info:
 	@echo " Targets : $(TARGETS)"
 
 build: $(NAME)
-	@echo "    —————————————————————————————————————————————  "
+	@echo "    --------------------------------------------   "
 	@echo "       Complete to create $(NAME) into $(EXE_DIR)  "
 	@echo "          Let's try doing $(EXE_DIR)/$(NAME) !     "
-	@echo "    —————————————————————————————————————————————  "
+	@echo "    --------------------------------------------   "
 
 $(NAME): $(OBJECTS)
 	-@mkdir -p $(EXE_DIR)

@@ -32,9 +32,6 @@ void Display(void);
 void Timer(int value);
 void Resize(int w, int h);
 void MouseClick(int button, int state, int x, int y);
-void MouseMotion(int x, int y);
-void KeyboardShortcut(unsigned char key, int x, int y);
-void CommandLine(unsigned char key, int x, int y);
 void keyboard_sp(int key, int x, int y);
 
 /* Declaration of new GRAPPA class */
@@ -43,13 +40,13 @@ Command Cmd;
 
 /* main function */
 int main(int argc, char *argv[]){
+    srand((unsigned) time(NULL));
     printf("\n\t\033[7m Welcom to GRAPPA \033[0m\n"
             " please type ':' key to input commands.\n\n");
     fflush(stdout);
     glutInit(&argc, argv);
     WindowCanvas();
     PopUpMenu();
-    // Controler();
     glutMainLoop();
     return 0;
 }
@@ -65,6 +62,7 @@ void WindowCanvas(void){
     glutTimerFunc(10,Timer,0);
     glutReshapeFunc(Resize);
     glClearColor(0.2,0.2,0.2,1.0);
+    Drawing.Init();
 }
 
 
@@ -80,7 +78,7 @@ void Display(void){
     glClear(GL_COLOR_BUFFER_BIT);
     Drawing.DrawPixel();
     Drawing.DrawCanvas();
-    Drawing.DrawGlutLine();
+    Drawing.DrawLine();
     Drawing.DrawColorBar();
     Drawing.DrawDisplay();
     Cmd.DrawCommand();
@@ -92,7 +90,7 @@ void Display(void){
 void Timer(int value){
     Controler();
     glutPostRedisplay();
-    glutTimerFunc(10,Timer,0);
+    glutTimerFunc(60,Timer,0);
 }
 
 
@@ -100,7 +98,7 @@ void Resize(int w, int h){
     glViewport(0, 0, w ,h);
     glLoadIdentity();
     gluOrtho2D(0.0, 1.0, 0.0, 1.0);
-    Drawing.Init(w,h);
+    Drawing.Resize(w,h);
     Cmd.Resize(w,h);
 }
 

@@ -21,7 +21,7 @@ void MouseClick(int button, int state, int x, int y){
     switch (button) {
         case GLUT_LEFT_BUTTON:
             if(state==GLUT_DOWN){
-                Drawing.NewFreeHand();
+                Drawing.NewLine();
                 Drawing.SetCoordinate(x,y);
             }
             if(state==GLUT_UP){
