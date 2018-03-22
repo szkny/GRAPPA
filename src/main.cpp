@@ -36,7 +36,7 @@ void MouseClick(int button, int state, int x, int y);
 void keyboard_sp(int key, int x, int y);
 
 /* Declaration of GRAPPA classes */
-GRAPPA Drawing;
+GRAPPA  Gra;
 Command Cmd;
 
 /* main function */
@@ -64,7 +64,7 @@ void WindowCanvas(void){
     glutTimerFunc(10,Timer,0);
     glutReshapeFunc(Resize);
     glClearColor(0.2,0.2,0.2,1.0);
-    Drawing.Init();
+    Gra.Init();
 }
 
 
@@ -78,11 +78,11 @@ void Controler(void){
 
 void Display(void){
     glClear(GL_COLOR_BUFFER_BIT);
-    Drawing.DrawPixel();
-    Drawing.DrawCanvas();
-    Drawing.DrawLine();
-    Drawing.DrawColorBar();
-    Drawing.DrawDisplay();
+    Gra.DrawPixel();
+    Gra.DrawCanvas();
+    Gra.DrawLine();
+    Gra.DrawColorBar();
+    Gra.DrawDisplay();
     Cmd.DrawCommand();
     glutIdleFunc(glutPostRedisplay);
     glFlush();
@@ -100,7 +100,7 @@ void Resize(int w, int h){
     glViewport(0, 0, w ,h);
     glLoadIdentity();
     gluOrtho2D(0.0, 1.0, 0.0, 1.0);
-    Drawing.Resize(w,h);
+    Gra.Resize(w,h);
     Cmd.Resize(w,h);
 }
 

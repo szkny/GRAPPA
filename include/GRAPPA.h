@@ -21,19 +21,19 @@
 
 /* Mode */
 #define MAXMODENUMBER 100
-enum DRAWMODE { MFREEHAND=0,
-                MCIRCLE,
-                MSQUARE,
-                MPOLYGON,
-                MSTRAIGHTLINE,
-                MRANDOM,
-                MKALEIDO
-};
-enum MOUSEMODE { MCOLORBARLINE=MAXMODENUMBER+1,
-                 MCOLORBARCANVAS,
-                 MLINEMOVE,
-                 MLINECOPY,
-                 MLINEROTATE
+enum {
+    MFREEHAND=0,
+    MCIRCLE,
+    MSQUARE,
+    MPOLYGON,
+    MSTRAIGHTLINE,
+    MRANDOM,
+    MKALEIDO,
+    MCOLORBARLINE=MAXMODENUMBER+1,
+    MCOLORBARCANVAS,
+    MLINEMOVE,
+    MLINECOPY,
+    MLINEROTATE,
 };
 
 /* Number of Circle Sampling */
@@ -55,8 +55,7 @@ class GRAPPA{
         int    WX,WY;                       // Window Size
         std::vector<line> Line;             // Line Data
         color CanvasColor;                  // Canvas Color R,G,B
-        color  DefaultLineColor;            // Default Line Color R,G,B
-        double DefaultLineWidth;            // Default Line Width
+        line DefaultLine;                   // Default Line
         int    CurrentLineID;               // for Undo/Redo Management
         int    DrawMode;                    // Draw Mode
         int    TmpDrawMode;                 // Temporary Draw Mode

@@ -2,14 +2,14 @@
  *  Keyboard Shortcuts Configurations
  */
 
+#include <iostream>
 #include <GRAPPA.h>
 
 GRAPPA::GRAPPA():ColorBarArray(1e3){
     //-- setting parameters --//
     Line.reserve(1e3);
     CanvasColor = {1.,1.,1.};
-    DefaultLineColor = {0.,0.,0.};
-    DefaultLineWidth = 2.0;
+    DefaultLine = {{0.,0.,0.},2.,};
     CurrentLineID = -1;
     for(int i=0;i<3;++i){
         for(int j=0;j<Xpixel;++j){
@@ -58,7 +58,7 @@ void GRAPPA::Resize(int wx, int wy){
 void GRAPPA::Reset(){
     // DrawMode = MFREEHAND;
     CanvasColor = {1.,1.,1.};
-    DefaultLineColor = {0.,0.,0.};
+    DefaultLine = {{0.,0.,0.},2.0,};
     Line.clear();
     CurrentLineID = -1;
     for(int i=0;i<3;++i){
@@ -77,9 +77,8 @@ void GRAPPA::NewLine(){
         while(CurrentLineID<(int)Line.size()-1)
             Line.pop_back();
         CurrentLineID++;
-        static std::vector<position> TmpPosition;
         while((int)Line.size()-1<CurrentLineID)
-            Line.push_back( {DefaultLineColor,DefaultLineWidth,TmpPosition} );
+            Line.push_back(DefaultLine);
         if(TmpFlag) TmpFlag = false;
         // if(ERFLAG) ++PixelEraserCounter;
     }
@@ -156,7 +155,7 @@ void GRAPPA::SetLineColor(double R, double G, double B){
 
 
 void GRAPPA::SetDefaultLineColor(double R, double G, double B){
-    DefaultLineColor = {R,G,B};
+    DefaultLine.Color = {R,G,B};
 }
 
 
@@ -169,7 +168,7 @@ void GRAPPA::SetLineWidth(double w){
 
 void GRAPPA::SetDefaultLineWidth(double w){
     if(5.0<w) w = 5.0;
-    DefaultLineWidth = w;
+    DefaultLine.Width = w;
 }
 
 
@@ -255,12 +254,12 @@ void GRAPPA::SetDrawMode(int mode, int N_side){
 }
 
 
-inline void GRAPPA::ClearCurrentLine(){
+void GRAPPA::ClearCurrentLine(){
     if(0<=CurrentLineID && CurrentLineID<(int)Line.size())
         Line[CurrentLineID].P.clear();
 }
 
-inline void GRAPPA::PushCurrentLine(position p){
+void GRAPPA::PushCurrentLine(position p){
     if(0<=CurrentLineID && CurrentLineID<(int)Line.size())
         Line[CurrentLineID].P.push_back(p);
 }
@@ -584,7 +583,7 @@ void GRAPPA::PixelMode(){
         }\
     }\
 }
-inline void GRAPPA::FillPixel(){
+void GRAPPA::FillPixel(){
     static double vx,vy,v_length,x0,y0,x,y,distance;
     static unsigned int whilecount,_size;
     _size = GetLine().P.size();
@@ -770,8 +769,8 @@ void GRAPPA::DrawDisplay(){
         glMatrixMode(GL_MODELVIEW);
 
         //-- Show Current Line Style --//
-        glColorStruct(DefaultLineColor);
-        glLineWidth(DefaultLineWidth);
+        glColorStruct(DefaultLine.Color);
+        glLineWidth(DefaultLine.Width);
         glBegin(GL_LINE_STRIP);
         glVertex2d(100./WX,1.-10./WY);
         glVertex2d(130./WX,1.-10./WY);
@@ -786,21 +785,19 @@ void GRAPPA::ShowStatus(){
 }
 
 
-inline line GRAPPA::GetLine(){
-    static std::vector<position> ErrPosition;
-    static line ErrLine = {DefaultLineColor,DefaultLineWidth,ErrPosition};
+line GRAPPA::GetLine(){
     if(0<=CurrentLineID && CurrentLineID<(int)Line.size())
         return Line[CurrentLineID];
-    else return ErrLine;
+    else return DefaultLine;
 }
 
-inline position GRAPPA::GetPosition(){
+position GRAPPA::GetPosition(){
     if(LineExist())
         return GetLine().P.back();
     else return {0,0};
 }
 
-inline bool GRAPPA::LineExist(){
+bool GRAPPA::LineExist(){
     if(!GetLine().P.empty()) return true;
     else return false;
 }

@@ -2,14 +2,15 @@
  *  Save & Load Images
  */
 
+#include<ctime>
 #include<Save.h>
 
-extern GRAPPA Drawing;
+extern GRAPPA Gra;
 
 const char *DefaultFileName = ".data.gra";
 
 void Save(const char *savefile){
-    if(Drawing.CurrentLineID == -1) return;
+    if(Gra.CurrentLineID == -1) return;
     static char file[400];
     if(!strcmp(savefile,""))
         sprintf(file,"%s",DefaultFileName);
@@ -24,9 +25,9 @@ void Save(const char *savefile){
             local->tm_mday,local->tm_hour,local->tm_min,local->tm_sec);
     printf("\tsave (%s) -> '%s'\n",date,file);
     fprintf(fp_save,"#-- %s --#\n",date);
-    fprintf(fp_save,"# CurrentLineID: %d\n\n",Drawing.CurrentLineID);
+    fprintf(fp_save,"# CurrentLineID: %d\n\n",Gra.CurrentLineID);
     unsigned int id = 0;
-    for(auto&& l : Drawing.Line){
+    for(auto&& l : Gra.Line){
         fprintf(fp_save,"# ID: %d\n",id);
         fprintf(fp_save,"# width: %lf\n",l.Width);
         fprintf(fp_save,"# rgb: %lf\t%lf\t%lf\n",l.Color.R,
@@ -57,7 +58,7 @@ void Load(const char *loadfile){
         printf("file not found. -> %s\n",file);
         return;
     }
-    Drawing.Reset();
+    Gra.Reset();
     static char buf[100],param[100],date[100],time[100];
     double arg[3];
     std::vector<position> InitPosition;
@@ -67,7 +68,7 @@ void Load(const char *loadfile){
     sscanf(buf,"#-- %s %s --#",date,time);
     printf("\tload (%s %s) -> '%s'\n",date,time,file);
     fgets(buf,sizeof(buf),fp_load);
-    sscanf(buf,"# %*s %d",&Drawing.CurrentLineID);
+    sscanf(buf,"# %*s %d",&Gra.CurrentLineID);
     while(fgets(buf,sizeof(buf),fp_load) != NULL){
         if(!strcmp(buf,"\n")){
             PosFlag = false;
@@ -76,23 +77,23 @@ void Load(const char *loadfile){
         if(!strncmp(buf,"#",1)){
             sscanf(buf,"# %s %lf %lf %lf",param,&arg[0],&arg[1],&arg[2]);
             if(!strcmp(param,"ID:"))
-                Drawing.Line.push_back( {{0,0,0},0,InitPosition} );
+                Gra.Line.push_back( {{0,0,0},0,InitPosition} );
             if(!strcmp(param,"width:"))
-                Drawing.Line.back().Width = arg[0];
+                Gra.Line.back().Width = arg[0];
             if(!strcmp(param,"rgb:"))
-                Drawing.Line.back().Color = {arg[0],arg[1],arg[2]};
+                Gra.Line.back().Color = {arg[0],arg[1],arg[2]};
             if(!strcmp(param,"x,y:"))
                 PosFlag = true;
             continue;
         }
         if(PosFlag){
             sscanf(buf,"%lf %lf",&arg[0],&arg[1]);
-            Drawing.Line.back().P.push_back( {(int)arg[0],(int)arg[1]} );
-            Drawing.FillPixel();
+            Gra.Line.back().P.push_back( {(int)arg[0],(int)arg[1]} );
+            Gra.FillPixel();
         }
     }
-    if((int)(Drawing.Line.size()-1)<Drawing.CurrentLineID)
-        Drawing.CurrentLineID = Drawing.Line.size()-1;
+    if((int)(Gra.Line.size()-1)<Gra.CurrentLineID)
+        Gra.CurrentLineID = Gra.Line.size()-1;
     fclose(fp_load);
     // remove(file);
     fflush(stdout);

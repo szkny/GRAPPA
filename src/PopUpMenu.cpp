@@ -13,7 +13,7 @@
 #include<GRAPPA.h>
 #include<MyGLUT.h>
 
-extern GRAPPA Drawing;
+extern GRAPPA Gra;
 void Menu(int val);
 
 enum POPUPMODE {
@@ -51,7 +51,7 @@ void PopUpMenu(void){
     glutAddMenuEntry("Copy",POPUP_COPY);
     glutAddMenuEntry("Move",POPUP_MOVE);
     glutAddMenuEntry("Pixel Mode",POPUP_PIXEL);
-    glutAddSubMenu("Drawing Mode",MenuID);
+    glutAddSubMenu("Gra Mode",MenuID);
     glutAddMenuEntry("Quit",POPUP_QUIT);
     /* Assign Menu Button */
     glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -62,43 +62,43 @@ void Menu(int val){
         case POPUP_QUIT: /* Quit */
             exit(0);
         case POPUP_LINECOLOR: /* Select Line Color */
-            Drawing.SetDrawMode(MCOLORBARLINE);
+            Gra.SetDrawMode(MCOLORBARLINE);
             break;
         case POPUP_CANVASCOLOR: /* Select Line Color */
-            Drawing.SetDrawMode(MCOLORBARCANVAS);
+            Gra.SetDrawMode(MCOLORBARCANVAS);
             break;
         case POPUP_RESET: /* Reset Lines */
-            Drawing.Reset();
+            Gra.Reset();
             break;
         case POPUP_UNDO: /* Undo */
-            Drawing.Undo();
+            Gra.Undo();
             break;
         case POPUP_REDO: /* Redo */
-            Drawing.Redo();
+            Gra.Redo();
             break;
         case POPUP_COPY: /* Copy */
-            Drawing.SetDrawMode(MLINECOPY);
+            Gra.SetDrawMode(MLINECOPY);
             break;
         case POPUP_MOVE: /* Move */
-            Drawing.SetDrawMode(MLINEMOVE);
+            Gra.SetDrawMode(MLINEMOVE);
             break;
         case POPUP_PIXEL: /* Pixel Mode */
-            Drawing.PixelMode();
+            Gra.PixelMode();
             break;
         case POPUP_STRAIGHTLINE: /* Draw Line */
-            Drawing.SetDrawMode(MSTRAIGHTLINE);
+            Gra.SetDrawMode(MSTRAIGHTLINE);
             break;
         case POPUP_CIRCLE: /* Draw Circle */
-            Drawing.SetDrawMode(MCIRCLE);
+            Gra.SetDrawMode(MCIRCLE);
             break;
         case POPUP_SQUARE: /* Draw Square */
-            Drawing.SetDrawMode(MSQUARE);
+            Gra.SetDrawMode(MSQUARE);
             break;
         case POPUP_RANDOM: /* Draw Random */
-            Drawing.SetDrawMode(MRANDOM);
+            Gra.SetDrawMode(MRANDOM);
             break;
         // case POPUP_KALEIDO: #<{(| Draw Kaleido |)}>#
-        //     Drawing.SetDrawMode(MKALEIDO);
+        //     Gra.SetDrawMode(MKALEIDO);
         //     break;
         default:
             break;

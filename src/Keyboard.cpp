@@ -6,7 +6,7 @@
 #include<Command.h>
 
 extern bool MFLAG;    //defined in Mouse.cpp
-extern GRAPPA Drawing;
+extern GRAPPA  Gra;
 extern Command Cmd;
 
 void MouseDrawMode(void);
@@ -19,22 +19,22 @@ void KeyboardShortcut(unsigned char key, int x, int y){
             exit(0);
             break;
         case 'u': /* Undo */
-            Drawing.Undo();
+            Gra.Undo();
             break;
         case 'c': /* Color */
-            Drawing.SetDrawMode(MCOLORBARLINE);
+            Gra.SetDrawMode(MCOLORBARLINE);
             break;
         case 'r': /* Redo */
-            Drawing.Redo();
+            Gra.Redo();
             break;
         case 'e': /* Erase */
-            Drawing.EraseLine();
+            Gra.EraseLine();
             break;
         case 'p': /* Pixel Mode */
-            Drawing.PixelMode();
+            Gra.PixelMode();
             break;
         case 's': /* Show Status */
-            Drawing.ShowStatus();
+            Gra.ShowStatus();
             break;
         case ':': /* Prompt Mode */
             Cmd.CommandMode();
