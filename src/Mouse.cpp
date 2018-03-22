@@ -13,7 +13,7 @@
 #include<GRAPPA.h>
 
 bool MFLAG;
-extern GRAPPA Drawing;
+extern GRAPPA Gra;
 
 
 /* mouse click */
@@ -21,14 +21,14 @@ void MouseClick(int button, int state, int x, int y){
     switch (button) {
         case GLUT_LEFT_BUTTON:
             if(state==GLUT_DOWN){
-                Drawing.NewLine();
-                Drawing.SetCoordinate(x,y);
+                Gra.NewLine();
+                Gra.SetCoordinate(x,y);
             }
             if(state==GLUT_UP){
                 MFLAG = false;
-                Drawing.SetDrawMode();
-                if(Drawing.PixelEraserFlag())
-                    Drawing.PixelEraser();
+                Gra.SetDrawMode();
+                if(Gra.PixelEraserFlag())
+                    Gra.PixelEraser();
             }
             break;
         default:
@@ -40,7 +40,7 @@ void MouseClick(int button, int state, int x, int y){
 /* mouse motion */
 void MouseMotion(int x, int y){
     if(MFLAG){
-        Drawing.SetCoordinate(x,y);
+        Gra.SetCoordinate(x,y);
     }
     MFLAG  = true;
 }

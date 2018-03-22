@@ -2,10 +2,6 @@
 #define SAVE_h_
 /*****************************/
 
-#include<cstdio>
-#include<cstdlib>
-#include<ctime>
-
 #include<GRAPPA.h>
 
 void Save(const char *savefile);

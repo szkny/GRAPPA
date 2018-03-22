@@ -2,12 +2,15 @@
  *  GRAPPA Commands Configurations
  */
 
+#include<iostream>
+#include<thread>
+#include<exception>
 #include<GRAPPA.h>
 #include<Command.h>
 #include<Save.h>
 
 extern bool MFLAG; //defined in Mouse.cpp
-extern GRAPPA Drawing;
+extern GRAPPA  Gra;
 extern Command Cmd;
 extern const char *DefaultFileName;
 
@@ -27,70 +30,70 @@ void Commands(){
         Cmd.Help();
 
     else if(Cmd.RunCommand("undo"))
-        Drawing.Undo();
+        Gra.Undo();
 
     else if(Cmd.RunCommand("redo"))
-        Drawing.Redo();
+        Gra.Redo();
 
     else if(Cmd.RunCommand("status"))
-        Drawing.ShowStatus();
+        Gra.ShowStatus();
 
     else if(Cmd.RunCommand("reset","clear"))
-        Drawing.Reset();
+        Gra.Reset();
 
     else if(Cmd.RunCommand("mv","move"))
-        Drawing.SetDrawMode(MLINEMOVE);
+        Gra.SetDrawMode(MLINEMOVE);
 
     else if(Cmd.RunCommand("cp","copy"))
-        Drawing.SetDrawMode(MLINECOPY);
+        Gra.SetDrawMode(MLINECOPY);
 
     else if(Cmd.RunCommand("rot","rotate"))
-        Drawing.SetDrawMode(MLINEROTATE);
+        Gra.SetDrawMode(MLINEROTATE);
 
     else if(Cmd.RunCommand("co"))
-        Drawing.SetDrawMode(MCOLORBARLINE);
+        Gra.SetDrawMode(MCOLORBARLINE);
 
     else if(Cmd.RunCommand("co",&Arg1,&Arg2,&Arg3))
-        Drawing.SetDefaultLineColor(Arg1,Arg2,Arg3);
+        Gra.SetDefaultLineColor(Arg1,Arg2,Arg3);
 
     else if(Cmd.RunCommand("cco"))
-        Drawing.SetDrawMode(MCOLORBARCANVAS);
+        Gra.SetDrawMode(MCOLORBARCANVAS);
 
     else if(Cmd.RunCommand("cco",&Arg1,&Arg2,&Arg3))
-        Drawing.SetCanvasColor(Arg1,Arg2,Arg3);
+        Gra.SetCanvasColor(Arg1,Arg2,Arg3);
 
     else if(Cmd.RunCommand("lw","width",&Arg1))
-        Drawing.SetDefaultLineWidth(Arg1);
+        Gra.SetDefaultLineWidth(Arg1);
 
     else if(Cmd.RunCommand("p","pixel"))
-        Drawing.PixelMode();
+        Gra.PixelMode();
 
     else if(Cmd.RunCommand("ps","pixelsize",&Arg1))
-        Drawing.SetPixelSize(Arg1);
+        Gra.SetPixelSize(Arg1);
 
     else if(Cmd.RunCommand("erase","eraser"))
-        Drawing.PixelEraser();
+        Gra.PixelEraser();
 
     else if(Cmd.RunCommand("free","freehand"))
-        Drawing.SetDrawMode(MFREEHAND);
+        Gra.SetDrawMode(MFREEHAND);
 
     else if(Cmd.RunCommand("circle"))
-        Drawing.SetDrawMode(MCIRCLE);
+        Gra.SetDrawMode(MCIRCLE);
 
     else if(Cmd.RunCommand("square"))
-        Drawing.SetDrawMode(MSQUARE);
+        Gra.SetDrawMode(MSQUARE);
 
     else if(Cmd.RunCommand("polygon",&Arg1))
-        Drawing.SetDrawMode(MPOLYGON,Arg1);
+        Gra.SetDrawMode(MPOLYGON,Arg1);
 
     else if(Cmd.RunCommand("line"))
-        Drawing.SetDrawMode(MSTRAIGHTLINE);
+        Gra.SetDrawMode(MSTRAIGHTLINE);
 
     else if(Cmd.RunCommand("rand","random"))
-        Drawing.SetDrawMode(MRANDOM);
+        Gra.SetDrawMode(MRANDOM);
 
     else if(Cmd.RunCommand("kaleido"))
-        Drawing.SetDrawMode(MKALEIDO);
+        Gra.SetDrawMode(MKALEIDO);
 
     else if(Cmd.RunCommandString("w","save",ArgString))
         Save(ArgString);
