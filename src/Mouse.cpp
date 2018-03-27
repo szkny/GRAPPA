@@ -11,6 +11,7 @@
 #endif
 
 #include<GRAPPA.h>
+#include<Declaration.h>
 
 bool MFLAG;
 extern GRAPPA Gra;
@@ -39,9 +40,7 @@ void MouseClick(int button, int state, int x, int y){
 
 /* mouse motion */
 void MouseMotion(int x, int y){
-    if(MFLAG){
-        Gra.SetCoordinate(x,y);
-    }
+    if(MFLAG) Gra.SetCoordinate(x,y);
     MFLAG  = true;
 }
 

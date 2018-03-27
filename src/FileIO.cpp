@@ -3,36 +3,49 @@
  */
 
 #include<ctime>
-#include<Save.h>
+#include<FileIO.h>
+#include<Declaration.h>
 
 extern GRAPPA Gra;
 
-const char *DefaultFileName = ".data.gra";
 
-void Save(const char *savefile){
-    if(Gra.CurrentLineID == -1) return;
-    static char file[400];
-    if(!strcmp(savefile,""))
-        sprintf(file,"%s",DefaultFileName);
-    else
-        sprintf(file,"%s",savefile);
-    FILE *fp_save = fopen(file,"w");
+void FileIO::Save(const char *savefile){
+    if( Gra.CurrentLineID == -1 ){
+        printf("no content to save.\n");
+        fflush(stdout);
+        return;
+    }
+    std::string _filename;
+    if(!strcmp(savefile,"")){
+        if( EmptyEditFileName() ){
+            printf("no file name.\n");
+            fflush(stdout);
+            return;
+        }else{
+            _filename = EditFileName;
+            std::cout<<_filename<<std::endl;
+        }
+    }else // savefile is not anonymous
+        _filename = savefile;
+    FILE *fp_save = fopen(_filename.c_str(),"w");
     time_t timer  = time(NULL);
     struct tm *local = localtime(&timer);
     char date[100];
     sprintf(date,"%04d/%02d/%02d %02d:%02d:%02d",
             local->tm_year+1900,local->tm_mon+1,
             local->tm_mday,local->tm_hour,local->tm_min,local->tm_sec);
-    printf("\tsave (%s) -> '%s'\n",date,file);
+    printf("\tsave (%s) -> '%s'\n",date,_filename.c_str());
     fprintf(fp_save,"#-- %s --#\n",date);
-    fprintf(fp_save,"# CurrentLineID: %d\n\n",Gra.CurrentLineID);
+    fprintf(fp_save,"# WindowSize:\t\t%d,%d\n",Gra.WX,Gra.WY);
+    fprintf(fp_save,"# CurrentLineID:\t%d\n\n",Gra.CurrentLineID);
     unsigned int id = 0;
     for(auto&& l : Gra.Line){
-        fprintf(fp_save,"# ID: %d\n",id);
-        fprintf(fp_save,"# width: %lf\n",l.Width);
-        fprintf(fp_save,"# rgb: %lf\t%lf\t%lf\n",l.Color.R,
-                                                 l.Color.G,
-                                                 l.Color.B);
+        fprintf(fp_save,"# ID:\t\t%d\n",id);
+        fprintf(fp_save,"# width:\t%lf\n",l.Width);
+        fprintf(fp_save,"# rgb:\t\t%lf\t%lf\t%lf\n",
+                                        l.Color.R,
+                                        l.Color.G,
+                                        l.Color.B);
         fprintf(fp_save,"# x,y:\n");
         for(auto&& p : l.P){
             fprintf(fp_save,"%d\t%d\n",p.x,p.y);
@@ -46,18 +59,19 @@ void Save(const char *savefile){
 }
 
 
-void Load(const char *loadfile){
-    static char file[400];
-    if(!strcmp(loadfile,""))
-        sprintf(file,"%s",DefaultFileName);
-    else
-        sprintf(file,"%s",loadfile);
-
-    FILE *fp_load = fopen(file,"r");
-    if(!fp_load){
-        printf("file not found. -> %s\n",file);
+void FileIO::Load(const char *loadfile){
+    if(!strcmp(loadfile,"")){
+        printf("no file name.\n");
+        fflush(stdout);
         return;
     }
+    FILE *fp_load = fopen(loadfile,"r");
+    if(!fp_load){
+        printf("file not found. -> '%s'\n",loadfile);
+        fflush(stdout);
+        return;
+    }
+    EditFileName = loadfile;
     Gra.Reset();
     static char buf[100],param[100],date[100],time[100];
     double arg[3];
@@ -66,8 +80,10 @@ void Load(const char *loadfile){
     fseek(fp_load,0,SEEK_SET);
     fgets(buf,sizeof(buf),fp_load);
     sscanf(buf,"#-- %s %s --#",date,time);
-    printf("\tload (%s %s) -> '%s'\n",date,time,file);
+    printf("\tload (%s %s) -> '%s'\n",date,time,loadfile);
     fgets(buf,sizeof(buf),fp_load);
+    sscanf(buf,"# %*s %lf,%lf",&arg[0],&arg[1]);
+    glutReshapeWindow((int)arg[0],(int)arg[1]);
     sscanf(buf,"# %*s %d",&Gra.CurrentLineID);
     while(fgets(buf,sizeof(buf),fp_load) != NULL){
         if(!strcmp(buf,"\n")){
@@ -99,4 +115,12 @@ void Load(const char *loadfile){
     fflush(stdout);
 }
 
+
+bool FileIO::EmptyEditFileName(){
+    if(EditFileName.size()){
+        return false;
+    }else{
+        return true;
+    }
+}
 

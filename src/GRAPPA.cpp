@@ -2,8 +2,8 @@
  *  Keyboard Shortcuts Configurations
  */
 
-#include <iostream>
-#include <GRAPPA.h>
+#include<iostream>
+#include<GRAPPA.h>
 
 GRAPPA::GRAPPA():ColorBarArray(1e3){
     //-- setting parameters --//

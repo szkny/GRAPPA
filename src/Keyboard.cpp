@@ -4,19 +4,16 @@
 
 #include<GRAPPA.h>
 #include<Command.h>
+#include<Declaration.h>
 
 extern bool MFLAG;    //defined in Mouse.cpp
 extern GRAPPA  Gra;
 extern Command Cmd;
 
-void MouseDrawMode(void);
-void KeyboardMode(void);
-void InputKey(unsigned char key, int x, int y);
-
 void KeyboardShortcut(unsigned char key, int x, int y){
     switch(key){
         case 'q': /* Quit */
-            exit(0);
+            Exit();
             break;
         case 'u': /* Undo */
             Gra.Undo();

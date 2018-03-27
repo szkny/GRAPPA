@@ -16,14 +16,13 @@
 #include<GL/glut.h>
 #endif
 
+#define PI  M_PI
+#define EPS 2.220e-16
+
 //0~1の一様乱数の作成する関数
 inline double randf(void){
     return (double)rand()/RAND_MAX;
 }
-
-#define PI M_PI
-
-#define EPS 2.220e-16
 
 /* Drawing String Function (string,position x,position y) */
 inline void glDrawString(const char *str, double x0, double y0){

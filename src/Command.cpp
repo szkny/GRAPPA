@@ -1,5 +1,5 @@
 /*
- *  GRAPPA Commands Configurations
+ *  GRAPPA Commands Settings
  */
 
 #include<iostream>
@@ -7,24 +7,20 @@
 #include<exception>
 #include<GRAPPA.h>
 #include<Command.h>
-#include<Save.h>
+#include<FileIO.h>
+#include<Declaration.h>
 
 extern bool MFLAG; //defined in Mouse.cpp
 extern GRAPPA  Gra;
 extern Command Cmd;
-extern const char *DefaultFileName;
+extern FileIO  Fio;
 
-void MouseDrawMode(void);
-void KeyboardMode(void);
-void KeyboardShortcut(unsigned char key, int x, int y);
-
-
-void Commands(){
+void Commands(){ // call when 'return key' is pushed
     static double Arg1,Arg2,Arg3;
     static char ArgString[200];
 
     if(Cmd.RunCommand("q","quit","exit"))
-        exit(0);
+        Exit();
 
     else if(Cmd.RunCommand("h","help"))
         Cmd.Help();
@@ -96,14 +92,14 @@ void Commands(){
         Gra.SetDrawMode(MKALEIDO);
 
     else if(Cmd.RunCommandString("w","save",ArgString))
-        Save(ArgString);
+        Fio.Save(ArgString);
 
     else if(Cmd.RunCommandString("e","edit",ArgString))
-        Load(ArgString);
+        Fio.Load(ArgString);
 
     else if(Cmd.RunCommandString("wq",ArgString)){
-        Save(ArgString);
-        exit(0);
+        Fio.Save(ArgString);
+        Exit();
     }
 
     else
@@ -114,20 +110,37 @@ void Commands(){
 
 
 void InputKey(unsigned char key, int x, int y){
-    if(key == 127){ //delete key
-        int size = Cmd.CommandStore(key);
-        if(size == 0) KeyboardMode();
-    }
-    else if(key == 13){ //return key
-        Commands();
-        Cmd.CommandStore(key);
-        KeyboardMode();
-    }
-    else if(key == 9){ //tab key
-        ;
-    }
-    else{
-        Cmd.CommandStore(key);
+    static int size;
+    switch(key){
+        case 9:  // tab key
+            break;
+        case 13: // return key
+            // try {
+            //     std::thread thread1(Commands);
+            //     std::thread thread2(std::ref(Cmd),key);
+            //     std::thread thread3(KeyboardMode);
+            //     thread1.join();
+            //     thread2.join();
+            //     thread3.join();
+            // }
+            // catch (std::exception &ex){
+            //     std::cerr << ex.what() << std::endl;
+            // }
+            Commands();
+            Cmd.CommandStore(key);
+            KeyboardMode();
+            break;
+        case 27:  // escape key
+            Cmd.CommandStore(13);
+            KeyboardMode();
+            break;
+        case 127: // delete key
+            size = Cmd.CommandStore(key);
+            if(size == 0) KeyboardMode();
+            break;
+        default:
+            Cmd.CommandStore(key);
+            break;
     }
 }
 
