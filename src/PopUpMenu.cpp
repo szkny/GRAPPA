@@ -12,9 +12,9 @@
 
 #include<GRAPPA.h>
 #include<MyGLUT.h>
+#include<Declaration.h>
 
 extern GRAPPA Gra;
-void Menu(int val);
 
 enum POPUPMODE {
     POPUP_QUIT=0,
@@ -35,14 +35,14 @@ enum POPUPMODE {
 
 void PopUpMenu(void){
     /* Sub Menu */
-    int MenuID = glutCreateMenu(Menu);
+    int MenuID = glutCreateMenu(PopUpMode);
     glutAddMenuEntry("line",POPUP_STRAIGHTLINE);
     glutAddMenuEntry("circle",POPUP_CIRCLE);
     glutAddMenuEntry("square",POPUP_SQUARE);
     glutAddMenuEntry("random",POPUP_RANDOM);
     // glutAddMenuEntry("kaleido",POPUP_KALEIDO);
     /* Main Menu */
-    glutCreateMenu(Menu);
+    glutCreateMenu(PopUpMode);
     glutAddMenuEntry("Select Line Color",POPUP_LINECOLOR);
     glutAddMenuEntry("Select Canvas Color",POPUP_CANVASCOLOR);
     glutAddMenuEntry("Reset All",POPUP_RESET);
@@ -57,8 +57,8 @@ void PopUpMenu(void){
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
-void Menu(int val){
-    switch(val){
+void PopUpMode(int mode){
+    switch(mode){
         case POPUP_QUIT: /* Quit */
             exit(0);
         case POPUP_LINECOLOR: /* Select Line Color */

@@ -14,13 +14,13 @@
 #include<Utility.h>
 #include<Colors.h>
 
-#define CmdNum  1000 /* Number of Stored Command */
+#define CmdNum 1000 /* Number of Stored Command */
 
 class Command{
     private:
         int windowW,windowH; /* Window Size */
         bool CMFLAG; /* Command Line Flag */
-        char CommandString[CmdNum][64]; /* Input Command String */
+        char CommandString[CmdNum][100]; /* Input Command String */
         int  CmdID;      /* Command LineID */
         int  CmdCursor;  /* Command Cursor */
         int  HstCounter; /* Go Back Counter for CommandHistory */
@@ -69,23 +69,23 @@ inline void Command::Help(){
             "\033[47m|   circle   - draw circle.          |\033[49m\n"
             "\033[47m|   square   - draw square.          |\033[49m\n"
             "\033[47m|   polygon  - draw polygon.         |\033[49m\n"
-            "\033[47m|   line     - draw line.            |\033[49m\n"
-            "\033[47m|   rand     - draw random line.     |\033[49m\n"
+            "\033[47m|    line    - draw line.            |\033[49m\n"
+            "\033[47m|    rand    - draw random line.     |\033[49m\n"
             // "\033[47m|   kaleido  - draw kaleido.         |\033[49m\n"
-            "\033[47m|   undo     - undo draw line.       |\033[49m\n"
-            "\033[47m|   redo     - redo draw line.       |\033[49m\n"
-            "\033[47m|   mv       - move line.            |\033[49m\n"
-            "\033[47m|   cp       - copy line.            |\033[49m\n"
-            "\033[47m|   co       - change line color.    |\033[49m\n"
-            "\033[47m|   lw       - change line width.    |\033[49m\n"
+            "\033[47m|    undo    - undo draw line.       |\033[49m\n"
+            "\033[47m|    redo    - redo draw line.       |\033[49m\n"
+            "\033[47m|     mv     - move line.            |\033[49m\n"
+            "\033[47m|     cp     - copy line.            |\033[49m\n"
+            "\033[47m|     co     - change line color.    |\033[49m\n"
+            "\033[47m|     lw     - change line width.    |\033[49m\n"
             "\033[47m|   status   - show status.          |\033[49m\n"
-            // "\033[47m|   pixel    - pixel mode.           |\033[49m\n"
+            "\033[47m|    pixel   - pixel mode.           |\033[49m\n"
             // "\033[47m|   eraser   - pixel eraser.         |\033[49m\n"
             "\033[47m|   save (w) - save current sketch.  |\033[49m\n"
             "\033[47m|   edit (e) - load saved data.      |\033[49m\n"
             "\033[47m|   quit (q) - quit GRAPPA.          |\033[49m\n"
             "\033[47m+------------------------------------+\033[49m\n");
-    printf("\033[39m");
+    printf("\033[39m\n");
     fflush(stdout);
 }
 
@@ -114,14 +114,13 @@ inline void Command::DrawCommand(){
         glVertex2d(0,windowH);
         glEnd();
         glColor3d(1,1,1);
-        char s[256];
+        static char s[256];
         static unsigned char count = 0;
         static bool flag = false;
         if(flag){
             sprintf(s,":%s",CommandString[CmdID]);
             if(count%32==0) flag = false;
-        }
-        else{
+        }else{
             memset(s,'\0',sizeof(s));
             sprintf(s,":%s",CommandString[CmdID]);
             int size = strlen(s);
@@ -151,52 +150,55 @@ inline bool Command::CommandFlag(){
 
 
 inline int Command::CommandStore(unsigned char key){
+    static char s[4],tmp[128];
     int size = strlen(CommandString[CmdID]);
     if(CMFLAG){
-        if(key == 127){ //delete key
-            if(0<size){
-                if(CmdCursor){
-                    if(CmdCursor<size){
-                        for(int i=size-CmdCursor;i<size;++i){
-                            CommandString[CmdID][i-1] = CommandString[CmdID][i];
+        switch(key){
+            case 127: // delete key
+                if(0<size){
+                    if(CmdCursor){
+                        if(CmdCursor<size){
+                            for(int i=size-CmdCursor;i<size;++i){
+                                CommandString[CmdID][i-1] = CommandString[CmdID][i];
+                            }
+                            CommandString[CmdID][size-1] = '\0';
                         }
-                        CommandString[CmdID][size-1] = '\0';
                     }
+                    else memset(CommandString[CmdID]+size-1,'\0',1);
                 }
-                else memset(CommandString[CmdID]+size-1,'\0',1);
-            }
-            else{
-                HstCounter = 0;
-                CMFLAG = false;
-            }
-        }
-        else if(key == 13){ //return key
-            if(0<size){
-                if(HstCounter) HstCounter = 0;
-                if(CmdCursor)  CmdCursor  = 0;
-                ++CmdID;
-                if(CmdNum<=CmdID){
-                    CmdID = 0;
-                    memset(CommandString[CmdID],'\0',sizeof(CommandString[CmdID]));
+                else{
+                    HstCounter = 0;
+                    CMFLAG = false;
                 }
-                CMFLAG = false;
-            }
-        }
-        else{ //input charactors
-            if(CmdCursor&&CmdCursor<=size&&size<32){
-                char tmp[128];
-                memset(tmp,'\0',sizeof(tmp));
-                for(int i=0;i<CmdCursor;++i)
-                    tmp[i] = CommandString[CmdID][i+size-CmdCursor];
-                CommandString[CmdID][size-CmdCursor]   = key;
-                CommandString[CmdID][size-CmdCursor+1] = '\0';
-                strcat(CommandString[CmdID],tmp);
-            }
-            else{
-                char s[4];
-                sprintf(s,"%c",key);
-                if(size<32) strcat(CommandString[CmdID],s);
-            }
+                break;
+
+            case 13: // return key
+                if(0<size){
+                    if(HstCounter) HstCounter = 0;
+                    if(CmdCursor)  CmdCursor  = 0;
+                    ++CmdID;
+                    if(CmdNum<=CmdID){
+                        CmdID = 0;
+                        memset(CommandString[CmdID],'\0',sizeof(CommandString[CmdID]));
+                    }
+                    CMFLAG = false;
+                }
+                break;
+
+            default: // input charactor
+                if(CmdCursor&&CmdCursor<=size&&size<32){
+                    memset(tmp,'\0',sizeof(tmp));
+                    for(int i=0;i<CmdCursor;++i)
+                        tmp[i] = CommandString[CmdID][i+size-CmdCursor];
+                    CommandString[CmdID][size-CmdCursor]   = key;
+                    CommandString[CmdID][size-CmdCursor+1] = '\0';
+                    strcat(CommandString[CmdID],tmp);
+                }
+                else{
+                    sprintf(s,"%c",key);
+                    if(size<32) strcat(CommandString[CmdID],s);
+                }
+                break;
         }
     }
     return size;
@@ -254,7 +256,7 @@ inline void Command::CommandCursor(int key){
 inline bool Command::RunCommand(const char *s0){
     bool match = false;
     if(!strcmp(CommandString[CmdID],s0)) match = true;
-    if(match) printf("Command:%s\n",CommandString[CmdID]);
+    if(match) printf("Command: %s\n",CommandString[CmdID]);
     return match;
 }
 
@@ -263,7 +265,7 @@ inline bool Command::RunCommand(const char *s0, const char *s1){
     bool match = false;
     if(!strcmp(CommandString[CmdID],s0)) match = true;
     if(!strcmp(CommandString[CmdID],s1)) match = true;
-    if(match) printf("Command:%s\n",CommandString[CmdID]);
+    if(match) printf("Command: %s\n",CommandString[CmdID]);
     return match;
 }
 
@@ -273,7 +275,7 @@ inline bool Command::RunCommand(const char *s0, const char *s1, const char *s2){
     if(!strcmp(CommandString[CmdID],s0)) match = true;
     if(!strcmp(CommandString[CmdID],s1)) match = true;
     if(!strcmp(CommandString[CmdID],s2)) match = true;
-    if(match) printf("Command:%s\n",CommandString[CmdID]);
+    if(match) printf("Command: %s\n",CommandString[CmdID]);
     return match;
 }
 
@@ -286,7 +288,7 @@ inline bool Command::RunCommand(const char *s0, double *a1){
     if(!strcmp(Command,s0)) match = true;
     if(match){
         (*a1) = arg1;
-        printf("Command:%s\t%f\n",Command,(*a1));
+        printf("Command: %s\t%f\n",Command,(*a1));
     }
     return match;
 }
@@ -302,7 +304,7 @@ inline bool Command::RunCommand(const char *s0, double *a1, double *a2){
     if(match){
         (*a1) = arg1;
         (*a2) = arg2;
-        printf("Command:%s\t%f\t%f\n",Command,(*a1),(*a2));
+        printf("Command: %s\t%f\t%f\n",Command,(*a1),(*a2));
     }
     return match;
 }
@@ -320,7 +322,7 @@ inline bool Command::RunCommand(const char *s0, double *a1, double *a2, double *
         (*a1) = arg1;
         (*a2) = arg2;
         (*a3) = arg3;
-        printf("Command:%s\t%f\t%f\t%f\n",Command,(*a1),(*a2),(*a3));
+        printf("Command: %s\t%f\t%f\t%f\n",Command,(*a1),(*a2),(*a3));
     }
     return match;
 }
@@ -340,7 +342,7 @@ inline bool Command::RunCommand(const char *s0, double *a1, double *a2, double *
         (*a2) = arg2;
         (*a3) = arg3;
         (*a4) = arg4;
-        printf("Command:%s\t%f\t%f\t%f\t%f\n",Command,(*a1),(*a2),(*a3),(*a4));
+        printf("Command: %s\t%f\t%f\t%f\t%f\n",Command,(*a1),(*a2),(*a3),(*a4));
     }
     return match;
 }
@@ -355,7 +357,7 @@ inline bool Command::RunCommand(const char *s0, const char *s1, double *a1){
     if(!strcmp(Command,s1)) match = true;
     if(match){
         (*a1) = arg1;
-        printf("Command:%s\t%f\n",Command,(*a1));
+        printf("Command: %s\t%f\n",Command,(*a1));
     }
     return match;
 }
@@ -363,23 +365,25 @@ inline bool Command::RunCommand(const char *s0, const char *s1, double *a1){
 
 inline bool Command::RunCommandString(const char *s0, char *arg){
     static char Command[100];
+    memset(arg,'\0',sizeof(*arg));
     sscanf(CommandString[CmdID],"%s %s",Command,arg);
     bool match = false;
     if(!strcmp(Command,s0)) match = true;
     if(match)
-        printf("Command:%s\t'%s'\n",Command,arg);
+        printf("Command: %s\t'%s'\n",Command,arg);
     return match;
 }
 
 
 inline bool Command::RunCommandString(const char *s0, const char *s1, char *arg){
     static char Command[100];
+    memset(arg,'\0',sizeof(*arg));
     sscanf(CommandString[CmdID],"%s %s",Command,arg);
     bool match = false;
     if(!strcmp(Command,s0)) match = true;
     if(!strcmp(Command,s1)) match = true;
     if(match)
-        printf("Command:%s\t'%s'\n",Command,arg);
+        printf("Command: %s\t'%s'\n",Command,arg);
     return match;
 }
 
