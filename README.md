@@ -27,7 +27,7 @@ $ make
 ```
 
 ## tutorials
-Go to directory where "GRAPPA" executable exists ("build" directory).     
+Go to directory where "GRAPPA" executable exists ("build" directory).       
 Then, execute GRAPPA with "GRAPPA.gra" as an argument.
 ```bash:bash
 $ ./GRAPPA ../tutorials/GRAPPA.gra
