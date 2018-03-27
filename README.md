@@ -26,19 +26,27 @@ Change directory to "GRAPPA" or "GRAPPA-master", then
 $ make
 ```
 
-## demo
+## tutorials
 Go to directory where "GRAPPA" executable exists ("build" directory).     
 Then, execute GRAPPA with "GRAPPA.gra" as an argument.
 ```bash:bash
-$ ./GRAPPA ../GRAPPA.gra
+$ ./GRAPPA ../tutorials/GRAPPA.gra
 ```
 As another way, after starting GRAPPA, type ":" to start the console mode, and enter the following command,
 ```vim:grappa consol
-:edit ../GRAPPA.gra
+:edit ../tutorials/GRAPPA.gra
 ```
 The command "edit" can simply written as "e".
 ```vim:grappa consol
-:e ../GRAPPA.gra
+:e ../tutorials/GRAPPA.gra
+```
+The editting data can be saved by "w" command.
+```vim:grappa consol
+:w
+```
+You can quit by "q" command.
+```vim:grappa consol
+:q
 ```
 GRAPPA's command list can be confirmed by "help" command.
 ```vim:grappa consol
