@@ -12,7 +12,7 @@ $ cd [Path to "GRAPPA-master.zip"]
 $ unzip GRAPPA-master.zip
 ```
 
-## install (Mac)
+## build (Mac)
 Change directory to "GRAPPA" or "GRAPPA-master", then
 ```bash:bash
 $ cd ./build
@@ -20,7 +20,7 @@ $ cmake ..
 $ make
 ```
 
-## install (Linux)
+## build (Linux)
 Change directory to "GRAPPA" or "GRAPPA-master", then
 ```bash:bash
 $ make
