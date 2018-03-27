@@ -6,7 +6,7 @@ Execute "git clone" command.
 ```bash
 $ git clone https://github.com/szkny/GRAPPA.git
 ```
-Or extract the zip file.   
+Or download zip file.   
 ```bash:bash
 $ cd [Path to "GRAPPA-master.zip"]
 $ unzip GRAPPA-master.zip
