@@ -265,7 +265,8 @@ void GRAPPA::PushCurrentLine(position p){
 }
 
 
-void GRAPPA::SetCoordinate(int x, int y){
+void GRAPPA::SetCoordinate(int x, int _y){
+    int y = WY - _y;
     switch(DrawMode){
         case MFREEHAND: /* Store Coordinate */
             {
@@ -693,13 +694,13 @@ void GRAPPA::DrawLine(){
                 glLineWidth(Line[id].Width);
                 glBegin(GL_LINE_STRIP);
                 for(auto&& p : Line[id].P)
-                    glVertex2d((double)p.x/WX,1-(double)p.y/WY);
+                    glVertex2d((double)p.x/WX,(double)p.y/WY);
                 glEnd();
             }
             else if(1==Line[id].P.size()){
                 glPointSize(Line[id].Width);
                 glBegin(GL_POINTS);
-                glVertex2d((double)Line[id].P[0].x/WX,1-(double)Line[id].P[0].y/WY);
+                glVertex2d((double)Line[id].P[0].x/WX,(double)Line[id].P[0].y/WY);
                 glEnd();
             }
         }

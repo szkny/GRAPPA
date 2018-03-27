@@ -26,6 +26,7 @@ enum POPUPMODE {
     POPUP_COPY,
     POPUP_MOVE,
     POPUP_PIXEL,
+    POPUP_FREEHAND,
     POPUP_STRAIGHTLINE,
     POPUP_CIRCLE,
     POPUP_SQUARE,
@@ -36,6 +37,7 @@ enum POPUPMODE {
 void PopUpMenu(void){
     /* Sub Menu */
     int MenuID = glutCreateMenu(PopUpMode);
+    glutAddMenuEntry("free hand",POPUP_FREEHAND);
     glutAddMenuEntry("line",POPUP_STRAIGHTLINE);
     glutAddMenuEntry("circle",POPUP_CIRCLE);
     glutAddMenuEntry("square",POPUP_SQUARE);
@@ -43,6 +45,7 @@ void PopUpMenu(void){
     // glutAddMenuEntry("kaleido",POPUP_KALEIDO);
     /* Main Menu */
     glutCreateMenu(PopUpMode);
+    glutAddSubMenu("Draw Mode",MenuID);
     glutAddMenuEntry("Select Line Color",POPUP_LINECOLOR);
     glutAddMenuEntry("Select Canvas Color",POPUP_CANVASCOLOR);
     glutAddMenuEntry("Reset All",POPUP_RESET);
@@ -51,7 +54,6 @@ void PopUpMenu(void){
     glutAddMenuEntry("Copy",POPUP_COPY);
     glutAddMenuEntry("Move",POPUP_MOVE);
     glutAddMenuEntry("Pixel Mode",POPUP_PIXEL);
-    glutAddSubMenu("Gra Mode",MenuID);
     glutAddMenuEntry("Quit",POPUP_QUIT);
     /* Assign Menu Button */
     glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -84,6 +86,9 @@ void PopUpMode(int mode){
             break;
         case POPUP_PIXEL: /* Pixel Mode */
             Gra.PixelMode();
+            break;
+        case POPUP_FREEHAND: /* Draw Free Hand */
+            Gra.SetDrawMode(MFREEHAND);
             break;
         case POPUP_STRAIGHTLINE: /* Draw Line */
             Gra.SetDrawMode(MSTRAIGHTLINE);

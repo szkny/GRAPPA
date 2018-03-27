@@ -11,7 +11,9 @@ class FileIO{
     public:
         void Save(const char *savefile);
         void Load(const char *loadfile);
+    protected:
         bool EmptyEditFileName();
+        bool CheckFileFormat(FILE *loadfile);
 };
 
 /*****************************/
