@@ -25,9 +25,10 @@ void FileIO::Save(const char *savefile){
             _filename = EditFileName;
             std::cout<<_filename<<std::endl;
         }
-    }else // savefile is not anonymous
+    }else // '*savefile' is not anonymous
         _filename = savefile;
     FILE *fp_save = fopen(_filename.c_str(),"w");
+    fprintf(fp_save,"#!GRAPPA\n");
     time_t timer  = time(NULL);
     struct tm *local = localtime(&timer);
     char date[100];
@@ -69,6 +70,13 @@ void FileIO::Load(const char *loadfile){
     if(!fp_load){
         printf("file not found. -> '%s'\n",loadfile);
         fflush(stdout);
+        fclose(fp_load);
+        return;
+    }
+    if(!CheckFileFormat(fp_load)){
+        printf("invarid file format.\n");
+        fflush(stdout);
+        fclose(fp_load);
         return;
     }
     EditFileName = loadfile;
@@ -77,14 +85,15 @@ void FileIO::Load(const char *loadfile){
     double arg[3];
     std::vector<position> InitPosition;
     bool PosFlag = false;
-    fseek(fp_load,0,SEEK_SET);
     fgets(buf,sizeof(buf),fp_load);
     sscanf(buf,"#-- %s %s --#",date,time);
     printf("\tload (%s %s) -> '%s'\n",date,time,loadfile);
     fgets(buf,sizeof(buf),fp_load);
-    sscanf(buf,"# %*s %lf,%lf",&arg[0],&arg[1]);
-    glutReshapeWindow((int)arg[0],(int)arg[1]);
-    sscanf(buf,"# %*s %d",&Gra.CurrentLineID);
+    sscanf(buf,"# %s %lf,%lf",param,&arg[0],&arg[1]);
+    if(!strcmp(param,"WindowSize:")) glutReshapeWindow((int)arg[0],(int)arg[1]);
+    fgets(buf,sizeof(buf),fp_load);
+    sscanf(buf,"# %s %lf",param,&arg[0]);
+    if(!strcmp(param,"CurrentLineID:")) Gra.CurrentLineID = (int)arg[0];
     while(fgets(buf,sizeof(buf),fp_load) != NULL){
         if(!strcmp(buf,"\n")){
             PosFlag = false;
@@ -111,7 +120,6 @@ void FileIO::Load(const char *loadfile){
     if((int)(Gra.Line.size()-1)<Gra.CurrentLineID)
         Gra.CurrentLineID = Gra.Line.size()-1;
     fclose(fp_load);
-    // remove(file);
     fflush(stdout);
 }
 
@@ -122,5 +130,15 @@ bool FileIO::EmptyEditFileName(){
     }else{
         return true;
     }
+}
+
+
+bool FileIO::CheckFileFormat(FILE *fp_load){
+    char buf[100],s[100];
+    fseek(fp_load,0,SEEK_SET);
+    fgets(buf,sizeof(buf),fp_load);
+    sscanf(buf,"%s",s);
+    if(!strcmp(s,"#!GRAPPA")) return true;
+    else return false;
 }
 
