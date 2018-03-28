@@ -154,24 +154,6 @@ inline int Command::CommandStore(unsigned char key){
     int size = strlen(CommandString[CmdID]);
     if(CMFLAG){
         switch(key){
-            case 127: // delete key
-                if(0<size){
-                    if(CmdCursor){
-                        if(CmdCursor<size){
-                            for(int i=size-CmdCursor;i<size;++i){
-                                CommandString[CmdID][i-1] = CommandString[CmdID][i];
-                            }
-                            CommandString[CmdID][size-1] = '\0';
-                        }
-                    }
-                    else memset(CommandString[CmdID]+size-1,'\0',1);
-                }
-                else{
-                    HstCounter = 0;
-                    CMFLAG = false;
-                }
-                break;
-
             case 13: // return key
                 if(0<size){
                     if(HstCounter) HstCounter = 0;
@@ -181,6 +163,34 @@ inline int Command::CommandStore(unsigned char key){
                         CmdID = 0;
                         memset(CommandString[CmdID],'\0',sizeof(CommandString[CmdID]));
                     }
+                    CMFLAG = false;
+                }
+                break;
+
+            case 27: // escape key
+                HstCounter = 0;
+                CmdCursor  = 0;
+                CMFLAG = false;
+                if(0<size){
+                    ++CmdID;
+                    if(CmdNum<=CmdID){
+                        CmdID = 0;
+                        memset(CommandString[CmdID],'\0',sizeof(CommandString[CmdID]));
+                    }
+                }
+                break;
+
+            case 127: // delete key
+                if(0<size){
+                    if(CmdCursor){
+                        if(CmdCursor<size){
+                            for(int i=size-CmdCursor;i<size;++i)
+                                CommandString[CmdID][i-1] = CommandString[CmdID][i];
+                            CommandString[CmdID][size-1] = '\0';
+                        }
+                    }else memset(CommandString[CmdID]+size-1,'\0',1);
+                }else{
+                    HstCounter = 0;
                     CMFLAG = false;
                 }
                 break;

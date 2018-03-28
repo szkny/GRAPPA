@@ -605,15 +605,15 @@ void GRAPPA::FillPixel(){
                 x += vx;
                 y += vy;
                 distance = sqrt(pow(x0-x,2)+pow(y0-y,2));
-                FillEachPixel(x,y);
+                FillEachPixel(x,WY-y);
                 ++whilecount;
                 if(1e6<whilecount) break;
             }
         }else //v==0
-            FillEachPixel(GetPosition().x,GetPosition().y);
+            FillEachPixel(GetPosition().x,WY-GetPosition().y);
     }else{ //_size<=1
         if(LineExist())
-            FillEachPixel(GetLine().P[0].x,GetLine().P[0].y);
+            FillEachPixel(GetLine().P[0].x,WY-GetLine().P[0].y);
     }
 }
 #undef FillEachPixel

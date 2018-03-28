@@ -15,6 +15,9 @@ void KeyboardShortcut(unsigned char key, int x, int y){
         case 'q': /* Quit */
             Exit();
             break;
+        case 27:  /* ESC */
+            Gra.SetDrawMode();
+            break;
         case 'u': /* Undo */
             Gra.Undo();
             break;
