@@ -11,25 +11,29 @@ extern GRAPPA Gra;
 
 void FileIO::Save(const char *savefile){
     if( Gra.CurrentLineID == -1 ){
-        printf("no content to save.\n");
+        puts("no content to save.");
         fflush(stdout);
         return;
     }
     std::string _filename;
     if(!strcmp(savefile,"")){
         if( EmptyEditFileName() ){
-            printf("no file name.\n");
+            puts("no file name.");
             fflush(stdout);
             return;
         }else{
             _filename = EditFileName;
-            std::cout<<_filename<<std::endl;
         }
     }else // '*savefile' is not anonymous
         _filename = savefile;
     FILE *fp_save = fopen(_filename.c_str(),"w");
-    fprintf(fp_save,"#!GRAPPA\n");
-    time_t timer  = time(NULL);
+    fprintf(fp_save,"#      ____ ____      _    ____  ____   _\n"
+                    "#     / ___|  _ \\    / \\  |  _ \\|  _ \\ / \\\n"
+                    "#    | |  _| |_) |  / _ \\ | |_) | |_) / _ \\\n"
+                    "#    | |_| |  _ <  / ___ \\|  __/|  __/ ___ \\\n"
+                    "#     \\____|_| \\_\\/_/   \\_\\_|   |_| /_/   \\_\\\n"
+                    "#\n");
+    time_t timer = time(NULL);
     struct tm *local = localtime(&timer);
     char date[100];
     sprintf(date,"%04d/%02d/%02d %02d:%02d:%02d",
@@ -62,7 +66,7 @@ void FileIO::Save(const char *savefile){
 
 void FileIO::Load(const char *loadfile){
     if(!strcmp(loadfile,"")){
-        printf("no file name.\n");
+        puts("no file name.");
         fflush(stdout);
         return;
     }
@@ -74,7 +78,7 @@ void FileIO::Load(const char *loadfile){
         return;
     }
     if(!CheckFileFormat(fp_load)){
-        printf("invarid file format.\n");
+        printf("invarid file format. -> '%s'\n",loadfile);
         fflush(stdout);
         fclose(fp_load);
         return;
@@ -134,11 +138,22 @@ bool FileIO::EmptyEditFileName(){
 
 
 bool FileIO::CheckFileFormat(FILE *fp_load){
-    char buf[100],s[100];
+    std::string s;
+    char buf[100];
+    bool flag = true;
     fseek(fp_load,0,SEEK_SET);
-    fgets(buf,sizeof(buf),fp_load);
-    sscanf(buf,"%s",s);
-    if(!strcmp(s,"#!GRAPPA")) return true;
-    else return false;
+    fgets(buf,sizeof(buf),fp_load); s = buf;
+    if(s!="#      ____ ____      _    ____  ____   _\n")            flag = false;
+    fgets(buf,sizeof(buf),fp_load); s = buf;
+    if(s!="#     / ___|  _ \\    / \\  |  _ \\|  _ \\ / \\\n")      flag = false;
+    fgets(buf,sizeof(buf),fp_load); s = buf;
+    if(s!="#    | |  _| |_) |  / _ \\ | |_) | |_) / _ \\\n")        flag = false;
+    fgets(buf,sizeof(buf),fp_load); s = buf;
+    if(s!="#    | |_| |  _ <  / ___ \\|  __/|  __/ ___ \\\n")       flag = false;
+    fgets(buf,sizeof(buf),fp_load); s = buf;
+    if(s!="#     \\____|_| \\_\\/_/   \\_\\_|   |_| /_/   \\_\\\n") flag = false;
+    fgets(buf,sizeof(buf),fp_load); s = buf;
+    if(s!="#\n")                                                    flag = false;
+    return flag;
 }
 

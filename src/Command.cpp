@@ -131,7 +131,7 @@ void InputKey(unsigned char key, int x, int y){
             KeyboardMode();
             break;
         case 27:  // escape key
-            Cmd.CommandStore(13);
+            Cmd.CommandStore(key);
             KeyboardMode();
             break;
         case 127: // delete key
