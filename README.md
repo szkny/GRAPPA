@@ -1,5 +1,5 @@
 # GRAPPA
-Vim-like paint application powered by GLUT (for Mac or Linux).         
+Vim-like paint application powered by GLUT(openGL Utility Toolkit, C-lang 3D CG API) for Mac or Linux.         
 
 ## download
 Execute "git clone" command.
@@ -12,17 +12,11 @@ $ cd [Path to "GRAPPA-master.zip"]
 $ unzip GRAPPA-master.zip
 ```
 
-## build (Mac)
+## build
 Change directory to "GRAPPA" or "GRAPPA-master", then
 ```bash:bash
 $ cd ./build
 $ cmake ..
-$ make
-```
-
-## build (Linux)
-Change directory to "GRAPPA" or "GRAPPA-master", then
-```bash:bash
 $ make
 ```
 
