@@ -1,221 +1,110 @@
-/* main.cpp
-*
-*	main source for GRAPPA PAINT  
-*		(c) M,Haroon, S.Suzuki 2017.4.26 (origin)
-*					patch ———— 2017.5.5 (vol0.1.2)
-*/
+/*     ____ ____      _    ____  ____   _
+ *    / ___|  _ \    / \  |  _ \|  _ \ / \
+ *   | |  _| |_) |  / _ \ | |_) | |_) / _ \
+ *   | |_| |  _ <  / ___ \|  __/|  __/ ___ \
+ *    \____|_| \_\/_/   \_\_|   |_| /_/   \_\
+ *
+ * main.cpp
+ *  main source code for GRAPPA PAINT
+ *      (c) M.Haroon, S.Suzuki 2017.4.26 (origin)
+ *          patch ------------ 2018.3.22 (vol1.0.0)
+ */
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
 #include<time.h>
-#include<string.h>
 
+#ifdef __APPLE__
+#include<GL/freeglut.h>
+#endif
+
+#ifdef linux
 #include<GL/glut.h>
+#endif
+
 #include<GRAPPA.h>
+#include<Command.h>
+#include<FileIO.h>
+#include<Declaration.h>
 
-/* Number of Windows */
-const int WinNum = 1;
-int WindowID[WinNum];
+/* Declaration of GRAPPA classes */
+GRAPPA  Gra;
+Command Cmd;
+FileIO  Fio;
 
-/* Flags */
-bool MFLAG = false; /* Mouse Flag */
-bool M_Nodrag= false;/*For Drawing without Draggingmouse*/
-/* Function Prototype Declaration */
-void WindowCanvas(void);
-void PopUpMenu(void);
-void Controler(void);
-void init(void);
-void idle(void);
-void display(void);
-void resize(int w, int h);
-void mouse(int button, int state, int x, int y);
-void motion(int x, int y);
-void menu(int val);
-void keyboard(unsigned char key, int x, int y);
-void keyboard_sp(int key, int x, int y);
-
-/* Declaration of new GRAPPA class */
-GRAPPA Drawing;
 
 /* main function */
 int main(int argc, char *argv[]){
-	glutInit(&argc, argv);
-	WindowCanvas();
-	PopUpMenu();
-	Controler();
-	
-	glutMainLoop();
-	return 0;
+    srand((unsigned) time(NULL));
+    printf("\n\t\033[7m Welcom to GRAPPA \033[0m\n"
+            " please type ':' key to input commands.\n\n");
+    fflush(stdout);
+    glutInit(&argc, argv);
+    WindowCanvas();
+    PopUpMenu();
+    for(int i=1;i<argc;++i) Fio.Load(argv[i]);
+    glutMainLoop();
+    return 0;
 }
 
-/******** Functions *********/
+
+
+
+
+/*************** Functions *****************/
 
 void WindowCanvas(void){
-	glutInitWindowPosition(350,0);
-	glutInitWindowSize(809,500);
-	glutInitDisplayMode(GLUT_RGBA);
-	WindowID[0] = glutCreateWindow("GRAPPA PAINT");
-	glutDisplayFunc(display);
-	glutReshapeFunc(resize);
-	init();
-}
-
-
-void PopUpMenu(void){
-	glutCreateMenu(menu);
-	glutAddMenuEntry("Quit",0);
-    //glutAddMenuEntry("select color",1);
-	glutAttachMenu(GLUT_RIGHT_BUTTON);
+    glutInitWindowPosition(0,0);
+    glutInitWindowSize(500,400);
+    glutInitDisplayMode(GLUT_RGBA);
+    glutCreateWindow("GRAPPA PAINT");
+    glutDisplayFunc(Display);
+    Controler();
+    glutTimerFunc(10,Timer,0);
+    glutReshapeFunc(Resize);
+    glClearColor(0.2,0.2,0.2,1.0);
+    Gra.Init();
 }
 
 
 void Controler(void){
-	glutMouseFunc(mouse);
-    if(M_Nodrag) {
-        glutMotionFunc(NULL);
-        glutPassiveMotionFunc(motion);//allows to draw without Dragging mouse
-    }
-    else {
-        glutPassiveMotionFunc(NULL);
-        glutMotionFunc(motion);
-    }
-	glutKeyboardFunc(keyboard);
-	glutSpecialFunc(keyboard_sp);
+    glutMouseFunc(MouseClick);
+    MouseDrawMode();
+    KeyboardMode();
+    glutSpecialFunc(keyboard_sp);
 }
 
 
-void init(void){
-	glClearColor(0.2,0.2,0.2,1.0);
+void Display(void){
+    glClear(GL_COLOR_BUFFER_BIT);
+    Gra.DrawPixel();
+    Gra.DrawCanvas();
+    Gra.DrawLine();
+    Gra.DrawColorBar();
+    Gra.DrawDisplay();
+    Cmd.DrawCommand();
+    Fio.DrawFileName();
+    glutSwapBuffers();
 }
 
 
-void idle(void){
-	for(int i=0; i<WinNum; ++i){
-		glutSetWindow(WindowID[i]);
-		glutPostRedisplay();
-	}
+void Timer(int value){
+    glutPostRedisplay();
+    glutTimerFunc(60,Timer,0);
 }
 
 
-void display(void){
-	glClear(GL_COLOR_BUFFER_BIT);
-	
-	Drawing.SetColor(1.0,1.0,1.0);
-	Drawing.DrawCanvas();
-
-	Drawing.SetColor(0.0,0.0,0.0);
-	Drawing.DrawFreeHand();
-	Drawing.Display();
-	
-	glFlush();
+void Resize(int w, int h){
+    glViewport(0, 0, w ,h);
+    glLoadIdentity();
+    gluOrtho2D(0.0, 1.0, 0.0, 1.0);
+    Gra.Resize(w,h);
+    Cmd.Resize(w,h);
 }
 
 
-void resize(int w, int h){
-	glViewport(0, 0, w ,h);
-	glLoadIdentity();
-	gluOrtho2D(0.0, 1.0, 0.0, 1.0);
-	Drawing.Init(w,h);
-}
-
-
-/* mouse click */
-void mouse(int button, int state, int x, int y){
-	switch (button) {
-		case GLUT_LEFT_BUTTON:
-			if(M_Nodrag){
-				if(state==GLUT_DOWN){
-					MFLAG = false;
-				}
-				if(state==GLUT_UP){
-					Drawing.NewFreeHand();
-					Drawing.SetCoordinate(x,y);
-				}
-			}
-			else{
-				if(state==GLUT_UP){
-					MFLAG = false;
-				}
-				if(state==GLUT_DOWN){
-					Drawing.NewFreeHand();
-					Drawing.SetCoordinate(x,y);
-				}
-			}
-			glutIdleFunc(idle);
-			break;
-		default:
-			break;
-	}
-}
-
-
-/* mouse motion */
-void motion(int x, int y){
-	if(MFLAG){
-		Drawing.SetCoordinate(x,y);
-	}
-	MFLAG  = true;
-}
-
-
-void menu(int val){
-	switch(val){
-		case 0:  /* Quit */
-			exit(0);
-		default:
-			break;
-	}
-}
-
-
-void keyboard(unsigned char key, int x, int y){
-	switch(key){
-		case 'q': /* Quit */
-		case 'Q':
-		case '\033':
-			exit(0);
-		case 'z': /* Undo */
-		case 'Z':
-			Drawing.Undo();
-			glutIdleFunc(idle);
-			break;
-		case 's':
-		case 'S':
-			Drawing.Status();
-			glutIdleFunc(idle);
-			break;
-        case 'n':
-            if(M_Nodrag){
-                M_Nodrag = false;
-                MFLAG = false;
-            }
-             else {
-                 M_Nodrag = true;
-                 MFLAG = true;
-                 Drawing.NewFreeHand();
-             }
-            Controler();
-            break;
-		default:
-			break;
-	}
-}
-
-
-void keyboard_sp(int key, int x, int y){
-	switch (key) {
-		case GLUT_KEY_RIGHT:
-			break;
-		case GLUT_KEY_LEFT:
-			break;
-		case GLUT_KEY_UP:
-			break;
-		case GLUT_KEY_DOWN:
-			break;
-		default:
-			break;
-	}
+void Exit(){
+    printf("\n\t\033[7m  Bye :)  \033[0m\n");
+    fflush(stdout);
+    exit(0);
 }
 
 
