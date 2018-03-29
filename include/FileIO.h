@@ -3,16 +3,20 @@
 /*****************************/
 
 #include<iostream>
+#include<vector>
 #include<GRAPPA.h>
 
 class FileIO{
-    private:
-        std::string EditFileName;
     public:
+        std::vector<std::string> FormatID;
+        std::string EditFileName;
+
+    public:
+        FileIO();
+        ~FileIO(){};
         void Save(const char *savefile);
         void Load(const char *loadfile);
         void DrawFileName();
-    protected:
         bool EmptyEditFileName();
         bool CheckFileFormat(FILE *loadfile);
 };

@@ -18,4 +18,3 @@ elseif(UNIX AND NOT APPLE)
     add_executable(GRAPPA ${sources})
     target_link_libraries(GRAPPA glut GLU GL Xmu Xi Xext X11 m pthread)
 endif()
-

@@ -9,6 +9,20 @@
 extern GRAPPA Gra;
 
 
+FileIO::FileIO(){
+    FormatID = {
+        "############################################\n",
+        "#   ____ ____      _    ____  ____   _     #\n",
+        "#  / ___|  _ \\    / \\  |  _ \\|  _ \\ / \\    #\n",
+        "# | |  _| |_) |  / _ \\ | |_) | |_) / _ \\   #\n",
+        "# | |_| |  _ <  / ___ \\|  __/|  __/ ___ \\  #\n",
+        "#  \\____|_| \\_\\/_/   \\_\\_|   |_| /_/   \\_\\ #\n",
+        "############################################\n",
+        "\n",
+    };
+}
+
+
 void FileIO::Save(const char *savefile){
     // if( Gra.CurrentLineID == -1 ){
     //     puts("no content to save.");
@@ -27,12 +41,8 @@ void FileIO::Save(const char *savefile){
     }else // '*savefile' is not anonymous
         _filename = savefile;
     FILE *fp_save = fopen(_filename.c_str(),"w");
-    fprintf(fp_save,"#      ____ ____      _    ____  ____   _\n"
-                    "#     / ___|  _ \\    / \\  |  _ \\|  _ \\ / \\\n"
-                    "#    | |  _| |_) |  / _ \\ | |_) | |_) / _ \\\n"
-                    "#    | |_| |  _ <  / ___ \\|  __/|  __/ ___ \\\n"
-                    "#     \\____|_| \\_\\/_/   \\_\\_|   |_| /_/   \\_\\\n"
-                    "#\n");
+    for(auto id : FormatID)
+        fprintf(fp_save,"%s",id.c_str());
     time_t timer = time(NULL);
     struct tm *local = localtime(&timer);
     char date[100];
@@ -138,22 +148,15 @@ bool FileIO::EmptyEditFileName(){
 
 
 bool FileIO::CheckFileFormat(FILE *fp_load){
-    std::string s;
+    std::string _s;
     char buf[100];
     bool flag = true;
     fseek(fp_load,0,SEEK_SET);
-    fgets(buf,sizeof(buf),fp_load); s = buf;
-    if(s!="#      ____ ____      _    ____  ____   _\n")            flag = false;
-    fgets(buf,sizeof(buf),fp_load); s = buf;
-    if(s!="#     / ___|  _ \\    / \\  |  _ \\|  _ \\ / \\\n")      flag = false;
-    fgets(buf,sizeof(buf),fp_load); s = buf;
-    if(s!="#    | |  _| |_) |  / _ \\ | |_) | |_) / _ \\\n")        flag = false;
-    fgets(buf,sizeof(buf),fp_load); s = buf;
-    if(s!="#    | |_| |  _ <  / ___ \\|  __/|  __/ ___ \\\n")       flag = false;
-    fgets(buf,sizeof(buf),fp_load); s = buf;
-    if(s!="#     \\____|_| \\_\\/_/   \\_\\_|   |_| /_/   \\_\\\n") flag = false;
-    fgets(buf,sizeof(buf),fp_load); s = buf;
-    if(s!="#\n")                                                    flag = false;
+    for(auto id : FormatID){
+        fgets(buf,sizeof(buf),fp_load);
+        _s = buf;
+        if(_s!=id) flag = false;
+    }
     return flag;
 }
 
