@@ -26,6 +26,7 @@ enum POPUPMODE {
     POPUP_COPY,
     POPUP_MOVE,
     POPUP_PIXEL,
+    POPUP_STATUS,
     POPUP_FREEHAND,
     POPUP_STRAIGHTLINE,
     POPUP_CIRCLE,
@@ -54,6 +55,7 @@ void PopUpMenu(void){
     glutAddMenuEntry("Copy",POPUP_COPY);
     glutAddMenuEntry("Move",POPUP_MOVE);
     glutAddMenuEntry("Pixel Mode",POPUP_PIXEL);
+    glutAddMenuEntry("Show Status",POPUP_STATUS);
     glutAddMenuEntry("Quit",POPUP_QUIT);
     /* Assign Menu Button */
     glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -86,6 +88,9 @@ void PopUpMode(int mode){
             break;
         case POPUP_PIXEL: /* Pixel Mode */
             Gra.PixelMode();
+            break;
+        case POPUP_STATUS: /* Show Status */
+            Gra.ShowStatus();
             break;
         case POPUP_FREEHAND: /* Draw Free Hand */
             Gra.SetDrawMode(MFREEHAND);

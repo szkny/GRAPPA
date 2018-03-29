@@ -10,11 +10,11 @@ extern GRAPPA Gra;
 
 
 void FileIO::Save(const char *savefile){
-    if( Gra.CurrentLineID == -1 ){
-        puts("no content to save.");
-        fflush(stdout);
-        return;
-    }
+    // if( Gra.CurrentLineID == -1 ){
+    //     puts("no content to save.");
+    //     fflush(stdout);
+    //     return;
+    // }
     std::string _filename;
     if(!strcmp(savefile,"")){
         if( EmptyEditFileName() ){
@@ -75,6 +75,7 @@ void FileIO::Load(const char *loadfile){
         printf("file not found. -> '%s'\n",loadfile);
         fflush(stdout);
         fclose(fp_load);
+        EditFileName = loadfile;
         return;
     }
     if(!CheckFileFormat(fp_load)){
@@ -129,11 +130,10 @@ void FileIO::Load(const char *loadfile){
 
 
 bool FileIO::EmptyEditFileName(){
-    if(EditFileName.size()){
+    if(EditFileName.size())
         return false;
-    }else{
+    else
         return true;
-    }
 }
 
 
@@ -156,4 +156,26 @@ bool FileIO::CheckFileFormat(FILE *fp_load){
     if(s!="#\n")                                                    flag = false;
     return flag;
 }
+
+
+void FileIO::DrawFileName(){
+    if(Gra.STFLAG){
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        gluOrtho2D(0, Gra.WX, Gra.WY, 0);
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        glColor3d(1.0-Gra.CanvasColor.R,1.0-Gra.CanvasColor.G,1.0-Gra.CanvasColor.B);
+        glDrawString(EditFileName.c_str(),10,Gra.WY-35);
+
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+    }
+}
+
 

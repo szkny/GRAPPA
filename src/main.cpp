@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
     glutInit(&argc, argv);
     WindowCanvas();
     PopUpMenu();
-    if(1<argc) Fio.Load(argv[1]);
+    for(int i=1;i<argc;++i) Fio.Load(argv[i]);
     glutMainLoop();
     return 0;
 }
@@ -57,6 +57,7 @@ void WindowCanvas(void){
     glutInitDisplayMode(GLUT_RGBA);
     glutCreateWindow("GRAPPA PAINT");
     glutDisplayFunc(Display);
+    Controler();
     glutTimerFunc(10,Timer,0);
     glutReshapeFunc(Resize);
     glClearColor(0.2,0.2,0.2,1.0);
@@ -80,13 +81,12 @@ void Display(void){
     Gra.DrawColorBar();
     Gra.DrawDisplay();
     Cmd.DrawCommand();
-    glutIdleFunc(glutPostRedisplay);
-    glFlush();
+    Fio.DrawFileName();
+    glutSwapBuffers();
 }
 
 
 void Timer(int value){
-    Controler();
     glutPostRedisplay();
     glutTimerFunc(60,Timer,0);
 }
