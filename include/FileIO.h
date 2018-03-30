@@ -7,7 +7,7 @@
 #include<GRAPPA.h>
 
 class FileIO{
-    public:
+    private:
         std::vector<std::string> FormatID;
         std::string EditFileName;
 
@@ -17,6 +17,9 @@ class FileIO{
         void Save(const char *savefile);
         void Load(const char *loadfile);
         void DrawFileName();
+        std::vector<std::string> GetFormatID();
+
+    protected:
         bool EmptyEditFileName();
         bool CheckFileFormat(FILE *loadfile);
 };

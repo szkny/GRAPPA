@@ -47,7 +47,7 @@ void KeyboardShortcut(unsigned char key, int x, int y){
 
 
 void KeyboardMode(void){
-    if(Cmd.CommandFlag()) glutKeyboardFunc(InputKey);
+    if(Cmd.GetCommandFlag()) glutKeyboardFunc(InputKey);
     else glutKeyboardFunc(KeyboardShortcut);
 }
 

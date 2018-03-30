@@ -34,7 +34,7 @@ FileIO  Fio;
 /* main function */
 int main(int argc, char *argv[]){
     srand((unsigned) time(NULL));
-    for(auto _s : Fio.FormatID)
+    for(auto _s : Fio.GetFormatID())
         std::cout<<_s;
     printf("\n\t\033[7m Welcom to GRAPPA \033[0m\n"
             " please type ':' key to input commands.\n\n");
@@ -46,8 +46,6 @@ int main(int argc, char *argv[]){
     glutMainLoop();
     return 0;
 }
-
-
 
 
 

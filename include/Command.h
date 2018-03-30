@@ -11,19 +11,20 @@
 #include<GL/glut.h>
 #endif
 
+#include<iostream>
+#include<vector>
 #include<Utility.h>
 #include<Colors.h>
 
-#define CmdNum 1000 /* Number of Stored Command */
 
 class Command{
     private:
-        int windowW,windowH; /* Window Size */
-        bool CMFLAG; /* Command Line Flag */
-        char CommandString[CmdNum][100]; /* Input Command String */
-        int  CmdID;      /* Command LineID */
-        int  CmdCursor;  /* Command Cursor */
-        int  HstCounter; /* Go Back Counter for CommandHistory */
+        int windowW,windowH;                    /* Window Size */
+        bool CMFLAG;                            /* Command Line Flag */
+        std::vector<std::string> CommandString; /* Input Command String */
+        int  CmdID;                             /* Current Command ID */
+        int  CmdCursor;                         /* Command Cursor */
+        int  HstCounter;                        /* Go Back Counter for CommandHistory */
     public:
         Command();
         void Resize(int WX, int WY);
@@ -31,7 +32,7 @@ class Command{
         void Notification();
         void DrawCommand();
         void CommandMode();
-        bool CommandFlag();
+        bool GetCommandFlag();
         int  CommandStore(unsigned char key);
         int  CommandHistory(int key);
         void CommandCursor(int key);
@@ -50,7 +51,7 @@ class Command{
 
 inline Command::Command(){
     CMFLAG = false;
-    memset(CommandString,'\0',sizeof(CommandString));
+    CommandString.resize(100);
     CmdID = 0;
     CmdCursor = 0;
     HstCounter = 0;
@@ -90,10 +91,8 @@ inline void Command::Help(){
 }
 
 inline void Command::Notification(){
-    char Command[100];
-    sscanf(CommandString[CmdID],"%s",Command);
-    printf("No such command. : '%s'\n",Command);
-    fflush(stdout);
+    std::cout<<"No such command. : "
+        <<CommandString[CmdID]<<std::endl;
 }
 
 inline void Command::DrawCommand(){
@@ -114,18 +113,18 @@ inline void Command::DrawCommand(){
         glVertex2d(0,windowH);
         glEnd();
         glColor3d(1,1,1);
-        static char s[256];
+        static char s[200];
         static unsigned char count = 0;
         static bool flag = false;
         if(flag){
-            sprintf(s,":%s",CommandString[CmdID]);
-            if(count%32==0) flag = false;
+            sprintf(s,":%s",CommandString[CmdID].c_str());
+            if(count%10==0) flag = false;
         }else{
             memset(s,'\0',sizeof(s));
-            sprintf(s,":%s",CommandString[CmdID]);
+            sprintf(s,":%s",CommandString[CmdID].c_str());
             int size = strlen(s);
             memset(s+size-CmdCursor,'_',1);
-            if(count%32==0) flag = true;
+            if(count%10==0) flag = true;
         }
         ++count;
         glDrawString2(s,5,windowH-10);
@@ -144,14 +143,13 @@ inline void Command::CommandMode(){
 }
 
 
-inline bool Command::CommandFlag(){
+inline bool Command::GetCommandFlag(){
     return CMFLAG;
 }
 
 
 inline int Command::CommandStore(unsigned char key){
-    static char s[4],tmp[128];
-    int size = strlen(CommandString[CmdID]);
+    int size = CommandString[CmdID].size();
     if(CMFLAG){
         switch(key){
             case 13: // return key
@@ -159,10 +157,6 @@ inline int Command::CommandStore(unsigned char key){
                     if(HstCounter) HstCounter = 0;
                     if(CmdCursor)  CmdCursor  = 0;
                     ++CmdID;
-                    if(CmdNum<=CmdID){
-                        CmdID = 0;
-                        memset(CommandString[CmdID],'\0',sizeof(CommandString[CmdID]));
-                    }
                     CMFLAG = false;
                 }
                 break;
@@ -171,24 +165,17 @@ inline int Command::CommandStore(unsigned char key){
                 HstCounter = 0;
                 CmdCursor  = 0;
                 CMFLAG = false;
-                if(0<size){
-                    ++CmdID;
-                    if(CmdNum<=CmdID){
-                        CmdID = 0;
-                        memset(CommandString[CmdID],'\0',sizeof(CommandString[CmdID]));
-                    }
-                }
+                if(0<size) ++CmdID;
                 break;
 
             case 127: // delete key
                 if(0<size){
                     if(CmdCursor){
-                        if(CmdCursor<size){
-                            for(int i=size-CmdCursor;i<size;++i)
-                                CommandString[CmdID][i-1] = CommandString[CmdID][i];
-                            CommandString[CmdID][size-1] = '\0';
-                        }
-                    }else memset(CommandString[CmdID]+size-1,'\0',1);
+                        if(CmdCursor<size)
+                            CommandString[CmdID].erase(
+                                CommandString[CmdID].begin()+size-CmdCursor-1
+                            );
+                    }else CommandString[CmdID].pop_back();
                 }else{
                     HstCounter = 0;
                     CMFLAG = false;
@@ -196,19 +183,15 @@ inline int Command::CommandStore(unsigned char key){
                 break;
 
             default: // input charactor
-                if(CmdCursor&&CmdCursor<=size&&size<32){
-                    memset(tmp,'\0',sizeof(tmp));
-                    for(int i=0;i<CmdCursor;++i)
-                        tmp[i] = CommandString[CmdID][i+size-CmdCursor];
-                    CommandString[CmdID][size-CmdCursor]   = key;
-                    CommandString[CmdID][size-CmdCursor+1] = '\0';
-                    strcat(CommandString[CmdID],tmp);
-                }
-                else{
-                    sprintf(s,"%c",key);
-                    if(size<32) strcat(CommandString[CmdID],s);
-                }
+                if(CmdCursor&&CmdCursor<=size&&size<50)
+                    CommandString[CmdID].insert(
+                        CommandString[CmdID].begin()+size-CmdCursor,
+                        key
+                    );
+                else if(size<50)
+                        CommandString[CmdID] += key;
                 break;
+
         }
     }
     return size;
@@ -220,27 +203,25 @@ inline int Command::CommandHistory(int key){
         switch(key){
             case GLUT_KEY_UP: //up-arrow key
                 if(0<CmdID-HstCounter){
-                    if(strlen(CommandString[CmdID-HstCounter-1])){
+                    if(CommandString[CmdID-HstCounter-1].size()){
                         ++HstCounter;
-                        strcpy(CommandString[CmdID],CommandString[CmdID-HstCounter]);
+                        CommandString[CmdID] = CommandString[CmdID-HstCounter];
                     }
                 }
                 break;
             case GLUT_KEY_DOWN: //down-arrow key
-                if(CmdID-HstCounter<CmdNum-1){
-                    if(strlen(CommandString[CmdID-HstCounter+1])){
-                        if(0<HstCounter) --HstCounter;
-                        strcpy(CommandString[CmdID],CommandString[CmdID-HstCounter]);
-                    }
-                    if(HstCounter==0)
-                        memset(CommandString[CmdID],'\0',sizeof(CommandString[CmdID]));
+                if(CommandString[CmdID-HstCounter+1].size()){
+                    if(0<HstCounter) --HstCounter;
+                    CommandString[CmdID] = CommandString[CmdID-HstCounter];
                 }
+                if(HstCounter==0)
+                    CommandString[CmdID].clear();
                 break;
             default:
                 break;
         }
     }
-    return strlen(CommandString[CmdID]);
+    return CommandString[CmdID].size();
 }
 
 
@@ -253,8 +234,8 @@ inline void Command::CommandCursor(int key){
                 break;
             case GLUT_KEY_LEFT: //left-arrow key
                 ++CmdCursor;
-                if((int)strlen(CommandString[CmdID])<CmdCursor)
-                    CmdCursor = strlen(CommandString[CmdID]);
+                if((int)CommandString[CmdID].size()<CmdCursor)
+                    CmdCursor = CommandString[CmdID].size();
                 break;
             default:
                 break;
@@ -265,27 +246,30 @@ inline void Command::CommandCursor(int key){
 
 inline bool Command::RunCommand(const char *s0){
     bool match = false;
-    if(!strcmp(CommandString[CmdID],s0)) match = true;
-    if(match) printf("Command: %s\n",CommandString[CmdID]);
+    if(CommandString[CmdID]==s0) match = true;
+    if(match) std::cout<<"Command: "
+                <<CommandString[CmdID]<<std::endl;
     return match;
 }
 
 
 inline bool Command::RunCommand(const char *s0, const char *s1){
     bool match = false;
-    if(!strcmp(CommandString[CmdID],s0)) match = true;
-    if(!strcmp(CommandString[CmdID],s1)) match = true;
-    if(match) printf("Command: %s\n",CommandString[CmdID]);
+    if(CommandString[CmdID]==s0) match = true;
+    if(CommandString[CmdID]==s1) match = true;
+    if(match) std::cout<<"Command: "
+                <<CommandString[CmdID]<<std::endl;
     return match;
 }
 
 
 inline bool Command::RunCommand(const char *s0, const char *s1, const char *s2){
     bool match = false;
-    if(!strcmp(CommandString[CmdID],s0)) match = true;
-    if(!strcmp(CommandString[CmdID],s1)) match = true;
-    if(!strcmp(CommandString[CmdID],s2)) match = true;
-    if(match) printf("Command: %s\n",CommandString[CmdID]);
+    if(CommandString[CmdID]==s0) match = true;
+    if(CommandString[CmdID]==s1) match = true;
+    if(CommandString[CmdID]==s2) match = true;
+    if(match) std::cout<<"Command: "
+                <<CommandString[CmdID]<<std::endl;
     return match;
 }
 
@@ -294,7 +278,7 @@ inline bool Command::RunCommand(const char *s0, double *a1){
     bool match = false;
     char Command[100];
     double arg1 = 0.0;
-    sscanf(CommandString[CmdID],"%s %lf",Command,&arg1);
+    sscanf(CommandString[CmdID].c_str(),"%s %lf",Command,&arg1);
     if(!strcmp(Command,s0)) match = true;
     if(match){
         (*a1) = arg1;
@@ -309,7 +293,7 @@ inline bool Command::RunCommand(const char *s0, double *a1, double *a2){
     char Command[100];
     double arg1 = 0.0;
     double arg2 = 0.0;
-    sscanf(CommandString[CmdID],"%s %lf %lf",Command,&arg1,&arg2);
+    sscanf(CommandString[CmdID].c_str(),"%s %lf %lf",Command,&arg1,&arg2);
     if(!strcmp(Command,s0)) match = true;
     if(match){
         (*a1) = arg1;
@@ -326,7 +310,8 @@ inline bool Command::RunCommand(const char *s0, double *a1, double *a2, double *
     double arg1 = 0.0;
     double arg2 = 0.0;
     double arg3 = 0.0;
-    sscanf(CommandString[CmdID],"%s %lf %lf %lf",Command,&arg1,&arg2,&arg3);
+    sscanf(CommandString[CmdID].c_str(),"%s %lf %lf %lf",
+            Command,&arg1,&arg2,&arg3);
     if(!strcmp(Command,s0)) match = true;
     if(match){
         (*a1) = arg1;
@@ -345,7 +330,8 @@ inline bool Command::RunCommand(const char *s0, double *a1, double *a2, double *
     double arg2 = 0.0;
     double arg3 = 0.0;
     double arg4 = 0.0;
-    sscanf(CommandString[CmdID],"%s %lf %lf %lf %lf",Command,&arg1,&arg2,&arg3,&arg4);
+    sscanf(CommandString[CmdID].c_str(),"%s %lf %lf %lf %lf",
+            Command,&arg1,&arg2,&arg3,&arg4);
     if(!strcmp(Command,s0)) match = true;
     if(match){
         (*a1) = arg1;
@@ -359,10 +345,10 @@ inline bool Command::RunCommand(const char *s0, double *a1, double *a2, double *
 
 
 inline bool Command::RunCommand(const char *s0, const char *s1, double *a1){
+    bool match = false;
     char Command[100];
     double arg1 = 0.0;
-    sscanf(CommandString[CmdID],"%s %lf",Command,&arg1);
-    bool match = false;
+    sscanf(CommandString[CmdID].c_str(),"%s %lf",Command,&arg1);
     if(!strcmp(Command,s0)) match = true;
     if(!strcmp(Command,s1)) match = true;
     if(match){
@@ -376,7 +362,7 @@ inline bool Command::RunCommand(const char *s0, const char *s1, double *a1){
 inline bool Command::RunCommandString(const char *s0, char *arg){
     static char Command[100];
     memset(arg,'\0',sizeof(*arg));
-    sscanf(CommandString[CmdID],"%s %s",Command,arg);
+    sscanf(CommandString[CmdID].c_str(),"%s %s",Command,arg);
     bool match = false;
     if(!strcmp(Command,s0)) match = true;
     if(match)
@@ -388,7 +374,7 @@ inline bool Command::RunCommandString(const char *s0, char *arg){
 inline bool Command::RunCommandString(const char *s0, const char *s1, char *arg){
     static char Command[100];
     memset(arg,'\0',sizeof(*arg));
-    sscanf(CommandString[CmdID],"%s %s",Command,arg);
+    sscanf(CommandString[CmdID].c_str(),"%s %s",Command,arg);
     bool match = false;
     if(!strcmp(Command,s0)) match = true;
     if(!strcmp(Command,s1)) match = true;

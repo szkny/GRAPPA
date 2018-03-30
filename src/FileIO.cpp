@@ -4,9 +4,11 @@
 
 #include<ctime>
 #include<FileIO.h>
+#include<Command.h>
 #include<Declaration.h>
 
-extern GRAPPA Gra;
+extern GRAPPA  Gra;
+extern Command Cmd;
 
 
 FileIO::FileIO(){
@@ -24,15 +26,10 @@ FileIO::FileIO(){
 
 
 void FileIO::Save(const char *savefile){
-    // if( Gra.CurrentLineID == -1 ){
-    //     puts("no content to save.");
-    //     fflush(stdout);
-    //     return;
-    // }
     std::string _filename;
     if(!strcmp(savefile,"")){
         if( EmptyEditFileName() ){
-            puts("no file name.");
+            puts("\tno file name.");
             fflush(stdout);
             return;
         }else{
@@ -76,20 +73,21 @@ void FileIO::Save(const char *savefile){
 
 void FileIO::Load(const char *loadfile){
     if(!strcmp(loadfile,"")){
-        puts("no file name.");
+        puts("\tno file name.");
         fflush(stdout);
         return;
     }
     FILE *fp_load = fopen(loadfile,"r");
     if(!fp_load){
-        printf("file not found. -> '%s'\n",loadfile);
+        printf("\tfile not found. -> '%s'\n",loadfile);
         fflush(stdout);
         fclose(fp_load);
+        Gra.Reset();
         EditFileName = loadfile;
         return;
     }
     if(!CheckFileFormat(fp_load)){
-        printf("invarid file format. -> '%s'\n",loadfile);
+        printf("\tinvarid file format. -> '%s'\n",loadfile);
         fflush(stdout);
         fclose(fp_load);
         return;
@@ -172,13 +170,21 @@ void FileIO::DrawFileName(){
         glLoadIdentity();
 
         glColor3d(1.0-Gra.CanvasColor.R,1.0-Gra.CanvasColor.G,1.0-Gra.CanvasColor.B);
-        glDrawString(EditFileName.c_str(),10,Gra.WY-35);
+        if(Cmd.GetCommandFlag())
+            glDrawString(EditFileName.c_str(),10,Gra.WY-35);
+        else
+            glDrawString(EditFileName.c_str(),10,Gra.WY-10);
 
         glPopMatrix();
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
     }
+}
+
+
+std::vector<std::string> FileIO::GetFormatID(){
+    return FormatID;
 }
 
 
