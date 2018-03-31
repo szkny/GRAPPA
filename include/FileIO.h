@@ -3,6 +3,7 @@
 /*****************************/
 
 #include<iostream>
+#include<fstream>
 #include<vector>
 #include<GRAPPA.h>
 
@@ -14,14 +15,14 @@ class FileIO{
     public:
         FileIO();
         ~FileIO(){};
-        void Save(const char *savefile);
-        void Load(const char *loadfile);
+        void Save(std::string savefile);
+        void Load(std::string loadfile);
         void DrawFileName();
         std::vector<std::string> GetFormatID();
 
     protected:
         bool EmptyEditFileName();
-        bool CheckFileFormat(FILE *loadfile);
+        bool CheckFileFormat(std::ifstream &fp_load);
 };
 
 /*****************************/

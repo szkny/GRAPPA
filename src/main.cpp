@@ -10,7 +10,9 @@
  *          patch ------------ 2018.3.22 (vol1.0.0)
  */
 
-#include<time.h>
+#include<ctime>
+#include<thread>
+#include<exception>
 
 #ifdef __APPLE__
 #include<GL/freeglut.h>
@@ -35,10 +37,9 @@ FileIO  Fio;
 int main(int argc, char *argv[]){
     srand((unsigned) time(NULL));
     for(auto _s : Fio.GetFormatID())
-        std::cout<<_s;
-    printf("\n\t\033[7m Welcom to GRAPPA \033[0m\n"
-            " please type ':' key to input commands.\n\n");
-    fflush(stdout);
+        std::cout << _s << std::endl;
+    std::cout << " Welcom to GRAPPA. type ':' to input commands.\n"
+              << std::endl;
     glutInit(&argc, argv);
     WindowCanvas();
     PopUpMenu();
@@ -56,6 +57,14 @@ void WindowCanvas(void){
     glutInitWindowSize(500,400);
     glutInitDisplayMode(GLUT_RGBA);
     glutCreateWindow("GRAPPA PAINT");
+    // try{
+    //     std::thread thread1(glutDisplayFunc,Display);
+    //     std::thread thread2(Controler);
+    //     thread1.join();
+    //     thread2.join();
+    // }catch(std::exception &ex){
+    //     std::cerr << ex.what() << std::endl;
+    // }
     glutDisplayFunc(Display);
     Controler();
     glutTimerFunc(10,Timer,0);
@@ -102,8 +111,8 @@ void Resize(int w, int h){
 
 
 void Exit(){
-    printf("\n\t\033[7m  Bye :)  \033[0m\n");
-    fflush(stdout);
+    std::cout << "\n Bye :)\n"
+              << std::endl;
     exit(0);
 }
 

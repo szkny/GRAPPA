@@ -11,6 +11,7 @@
 #include<GL/glut.h>
 #endif
 
+#include<thread>
 #include<iostream>
 #include<vector>
 #include<Utility.h>
@@ -91,8 +92,33 @@ inline void Command::Help(){
 }
 
 inline void Command::Notification(){
-    std::cout<<"No such command. : "
-        <<CommandString[CmdID]<<std::endl;
+    std::string _notification = "No such command. : "+CommandString[CmdID];
+    std::cout<<_notification<<std::endl;
+
+    // CMFLAG = true;
+    // glMatrixMode(GL_PROJECTION);
+    // glPushMatrix();
+    // glLoadIdentity();
+    // gluOrtho2D(0, windowW, windowH, 0);
+    // glMatrixMode(GL_MODELVIEW);
+    // glPushMatrix();
+    // glLoadIdentity();
+    //
+    // glColor3d(1.00,0.00,0.00);
+    // glBegin(GL_QUADS);
+    // glVertex2d(0,windowH-30);
+    // glVertex2d(windowW,windowH-30);
+    // glVertex2d(windowW,windowH);
+    // glVertex2d(0,windowH);
+    // glEnd();
+    // glColor3d(1,1,1);
+    // glDrawString2(_notification.c_str(),5,windowH-10);
+    //
+    // glPopMatrix();
+    // glMatrixMode(GL_PROJECTION);
+    // glPopMatrix();
+    // glMatrixMode(GL_MODELVIEW);
+    // std::this_thread::sleep_for(std::chrono::seconds(3));
 }
 
 inline void Command::DrawCommand(){

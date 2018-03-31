@@ -3,8 +3,6 @@
  */
 
 #include<iostream>
-#include<thread>
-#include<exception>
 #include<GRAPPA.h>
 #include<Command.h>
 #include<FileIO.h>
@@ -102,8 +100,7 @@ void Commands(){ // call when 'return key' is pushed
         Exit();
     }
 
-    else
-        Cmd.Notification();
+    else Cmd.Notification();
 
     fflush(stdout);
 }
@@ -114,30 +111,23 @@ void InputKey(unsigned char key, int x, int y){
     switch(key){
         case 9:  // tab key
             break;
+
         case 13: // return key
-            // try {
-            //     std::thread thread1(Commands);
-            //     std::thread thread2(std::ref(Cmd),key);
-            //     std::thread thread3(KeyboardMode);
-            //     thread1.join();
-            //     thread2.join();
-            //     thread3.join();
-            // }
-            // catch (std::exception &ex){
-            //     std::cerr << ex.what() << std::endl;
-            // }
             Commands();
             Cmd.CommandStore(key);
             KeyboardMode();
             break;
+
         case 27:  // escape key
             Cmd.CommandStore(key);
             KeyboardMode();
             break;
+
         case 127: // delete key
             size = Cmd.CommandStore(key);
             if(size == 0) KeyboardMode();
             break;
+
         default:
             Cmd.CommandStore(key);
             break;

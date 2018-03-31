@@ -6,7 +6,7 @@
 #include<cstdio>
 #include<cstdlib>
 #include<cmath>
-#include<string.h>
+#include<cstring>
 
 #ifdef __APPLE__
 #include<GL/freeglut.h>
