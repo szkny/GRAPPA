@@ -46,7 +46,7 @@ void FileIO::Save(std::string savefile){
             local->tm_year+1900,local->tm_mon+1,
             local->tm_mday,local->tm_hour,local->tm_min,local->tm_sec);
     std::cout << "\tsave (" << date << ") -> \'" << _filename << "\'" << std::endl;
-    fp_save << "#-- " << date << "--#\n";
+    fp_save << "#-- " << date << " --#\n";
     fp_save << "# WindowSize:\t\t" << Gra.WX << "\t" << Gra.WY << "\n";
     fp_save << "# CurrentLineID:\t" << Gra.CurrentLineID << "\n\n";
     unsigned int id = 0;
@@ -92,30 +92,32 @@ void FileIO::Load(std::string loadfile){
     double arg[3];
     std::vector<position> InitPosition;
     bool PosFlag = false;
-    getline(fp_load,buf);
-    sscanf(buf.c_str(),"#-- %s %s --#",date,time);
-    std::cout << "\tload (" << date << " " << time << ") -> \'"
-              << loadfile << "\'" << std::endl;
     while(getline(fp_load,buf)){ // load file loop
         if(buf==""){
             PosFlag = false;
             continue;
         }
-        else if(buf[0]=='#'){
-            sscanf(buf.c_str(),"# %s %lf %lf %lf",param,&arg[0],&arg[1],&arg[2]);
-            if(!strcmp(param,"WindowSize:"))
-                glutReshapeWindow((int)arg[0],(int)arg[1]);
-            if(!strcmp(param,"CurrentLineID:"))
-                Gra.CurrentLineID = (int)arg[0];
-            if(!strcmp(param,"ID:"))
-                Gra.Line.push_back( {{0,0,0},0,InitPosition} );
-            if(!strcmp(param,"width:"))
-                Gra.Line.back().Width = arg[0];
-            if(!strcmp(param,"rgb:"))
-                Gra.Line.back().Color = {arg[0],arg[1],arg[2]};
-            if(!strcmp(param,"x,y:"))
-                PosFlag = true;
-            continue;
+        else if(buf[0]=='#' && buf.size()>1){
+            if(buf[1]=='-'){
+                sscanf(buf.c_str(),"#-- %s %s --#",date,time);
+                std::cout << "\tload (" << date << " " << time << ") -> \'"
+                          << loadfile << "\'" << std::endl;
+            }else if(buf[1]==' '){
+                sscanf(buf.c_str(),"# %s %lf %lf %lf",param,&arg[0],&arg[1],&arg[2]);
+                if(!strcmp(param,"WindowSize:"))
+                    glutReshapeWindow((int)arg[0],(int)arg[1]);
+                if(!strcmp(param,"CurrentLineID:"))
+                    Gra.CurrentLineID = (int)arg[0];
+                if(!strcmp(param,"ID:"))
+                    Gra.Line.push_back( {{0,0,0},0,InitPosition} );
+                if(!strcmp(param,"width:"))
+                    Gra.Line.back().Width = arg[0];
+                if(!strcmp(param,"rgb:"))
+                    Gra.Line.back().Color = {arg[0],arg[1],arg[2]};
+                if(!strcmp(param,"x,y:"))
+                    PosFlag = true;
+                continue;
+            }
         }
         else if(PosFlag){
             sscanf(buf.c_str(),"%lf %lf",&arg[0],&arg[1]);

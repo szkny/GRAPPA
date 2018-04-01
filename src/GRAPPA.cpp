@@ -3,6 +3,7 @@
  */
 
 #include<iostream>
+#include<iomanip>
 #include<GRAPPA.h>
 
 GRAPPA::GRAPPA():ColorBarArray(1e3){
@@ -227,7 +228,7 @@ void GRAPPA::SetDrawMode(){
             DrawMode==MCOLORBARCANVAS){
         for(int i=0;i<ColorBarArray;++i)
             ColorBarWidth[i] = 3.0;
-        printf("\n");
+        std::cout << std::endl;
         DrawMode = TmpDrawMode;
     }
     if(TmpFlag) TmpFlag = false;
@@ -288,7 +289,8 @@ void GRAPPA::SetCoordinate(int x, int _y){
                     ColorBarWidth[i] = 3.0+exp(-(i-ch)*(i-ch)/(2*s*s));
                 hue2rgb C(x,WX);
                 SetDefaultLineColor(C.R,C.G,C.B);
-                printf("\r\tR:%f\tG:%f\tB:%f",C.R,C.G,C.B);
+                std::cout << std::fixed << std::setprecision(4)
+                          << "\r\tR:" << C.R << "\tG:" << C.G << "\tB:" << C.B;
                 fflush(stdout);
             }
             break;
@@ -302,7 +304,8 @@ void GRAPPA::SetCoordinate(int x, int _y){
                     ColorBarWidth[i] = 3.0+exp(-(i-ch)*(i-ch)/(2*s*s));
                 hue2rgb C(x,WX);
                 SetCanvasColor(C.R,C.G,C.B);
-                printf("\r\tR:%f\tG:%f\tB:%f",C.R,C.G,C.B);
+                std::cout << std::fixed << std::setprecision(4)
+                          << "\r\tR:" << C.R << "\tG:" << C.G << "\tB:" << C.B;
                 fflush(stdout);
             }
             break;
