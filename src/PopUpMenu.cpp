@@ -3,7 +3,7 @@
  */
 
 #ifdef __APPLE__
-#include<GL/freeglut.h>
+#include<GLUT/glut.h>
 #endif
 
 #ifdef linux
@@ -11,7 +11,7 @@
 #endif
 
 #include<GRAPPA.h>
-#include<MyGLUT.h>
+// #include<MyGLUT.h>
 #include<Declaration.h>
 
 extern GRAPPA Gra;
